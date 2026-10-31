@@ -1,0 +1,1977 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cooler Estates</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: stage 1 (massing) = brief panel above a rail of option cards beside a square plan;
+   stage 2 (landscape) = rail of strategy cards beside a square plan, 3D model band below. */
+:root {
+  --bg: #eef1ed; --surface: #fbfcfa; --ink: #18221c; --muted: #5a685f; --line: #d3dbd5;
+  --canopy: #2d7448; --canopy-soft: #dcebe0; --shade: #2a5c9a; --heat: #c9481f; --heat-soft: #f6e0d6;
+  --ground: #ece6d6; --bldg: #47504a; --path: #fffdf6; --path-edge: #b9b29f;
+  --a-playground: #e3a42b; --a-plaza: #8f7fcf; --a-fitness: #2f9e96; --a-community_garden: #93b832;
+  --f-display: "Archivo", system-ui, sans-serif;
+  --f-body: "Archivo", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111613; --surface: #18201b; --ink: #e2eae5; --muted: #95a39a; --line: #2b352f;
+  --canopy: #62c088; --canopy-soft: #1f3327; --shade: #79a6e6; --heat: #f07b51; --heat-soft: #3a2219;
+  --ground: #29271f; --bldg: #8c968f; --path: #d9d4c4; --path-edge: #6d6857;
+  --a-playground: #f0b84a; --a-plaza: #ab9ee6; --a-fitness: #4fc2b9; --a-community_garden: #acd048;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111613; --surface: #18201b; --ink: #e2eae5; --muted: #95a39a; --line: #2b352f;
+  --canopy: #62c088; --canopy-soft: #1f3327; --shade: #79a6e6; --heat: #f07b51; --heat-soft: #3a2219;
+  --ground: #29271f; --bldg: #8c968f; --path: #d9d4c4; --path-edge: #6d6857;
+  --a-playground: #f0b84a; --a-plaza: #ab9ee6; --a-fitness: #4fc2b9; --a-community_garden: #acd048;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 40px; }
+.app, .stage { max-width: 1320px; margin: 0 auto; display: grid; gap: 16px; width: 100%; }
+.num, .mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, label:focus-within, .card.option:focus-visible { outline: 2px solid var(--canopy); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; justify-content: space-between; }
+.brand h1 { font-family: var(--f-display); font-weight: 700; font-size: 24px; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.brand p { margin: 2px 0 0; color: var(--muted); max-width: 64ch; }
+.status { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 12.5px; white-space: nowrap; }
+.chip.ok { border-color: var(--canopy); color: var(--canopy); }
+.chip.bad { border-color: var(--heat); color: var(--heat); }
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.filebtn { position: relative; overflow: hidden; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.btn { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); font-size: 13px; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--canopy); border-color: var(--canopy); color: var(--surface); font-weight: 600; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+a.btn { text-decoration: none; display: inline-block; }
+
+/* main grid */
+.main { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.rail { display: grid; gap: 10px; min-width: 0; }
+.rail h2, .panel h2 { font-family: var(--f-display); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; text-align: left; width: 100%; }
+.card.option { cursor: pointer; transition: border-color .15s; }
+.card.option:hover { border-color: var(--muted); }
+.card.option.preview { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink) inset; }
+.card.option.selected { border-color: var(--canopy); box-shadow: 0 0 0 2px var(--canopy) inset; }
+.card .head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.card .name { font-family: var(--f-display); font-weight: 700; font-size: 16px; }
+.card .name .tag { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--ink); color: var(--surface); font-size: 12px; margin-right: 8px; vertical-align: 1px; }
+.card .idea { color: var(--muted); font-size: 12.5px; margin: 0; }
+.card .note { font-size: 12px; color: var(--heat); }
+.metrics { display: grid; grid-template-columns: 1fr auto auto; gap: 3px 10px; font-size: 13px; align-items: baseline; }
+.metrics .k { color: var(--muted); }
+.metrics .v { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.metrics .d { text-align: right; font-family: var(--f-mono); font-size: 12px; min-width: 64px; }
+.d.good { color: var(--canopy); } .d.bad { color: var(--heat); } .d.flat { color: var(--muted); }
+.best { font-family: var(--f-body); font-size: 10.5px; padding: 0 5px; border-radius: 4px; background: var(--canopy-soft); color: var(--canopy); margin-left: 4px; }
+.card .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.selbadge { font-size: 12px; color: var(--canopy); font-weight: 600; }
+
+/* plan panel */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 5px 10px; font-size: 13px; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.seg button:disabled { opacity: .4; cursor: not-allowed; }
+.layers { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; color: var(--muted); }
+.layers label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
+.planwrap { position: relative; width: 100%; max-width: 720px; margin: 0 auto; aspect-ratio: 1 / 1; }
+#plan { width: 100%; height: 100%; display: block; border-radius: 6px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 12px; padding: 6px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.readout { font-size: 12.5px; color: var(--muted); }
+
+/* massing additions */
+.brief { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px 22px; }
+.bgrp { display: grid; align-content: start; gap: 2px; }
+.bgrp h3 { font-family: var(--f-display); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 2px; }
+.brow { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; border-bottom: 1px dashed var(--line); }
+.brow .v { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); text-align: right; }
+.brow.key { background: var(--canopy-soft); border-bottom-color: transparent; border-radius: 6px; padding: 3px 6px; margin: 0 -6px 2px; }
+.brow input { width: 64px; font-family: var(--f-mono); font-size: 12.5px; text-align: right; padding: 2px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.brow .u { color: var(--muted); font-size: 12px; margin-left: 4px; display: inline-block; min-width: 14px; }
+.card.mopt { grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: start; }
+.mopt .thumb { width: 96px; height: 96px; border-radius: 6px; display: block; }
+.mopt .body { display: grid; gap: 6px; min-width: 0; }
+.mopt .name { font-size: 15px; }
+.mopt .metrics { font-size: 12px; gap: 3px 8px; }
+.mopt .metrics .k { white-space: nowrap; }
+.mopt .metrics .d { min-width: 0; }
+.empty2d { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: var(--muted); padding: 16px; background: var(--ground); border-radius: 6px; }
+#mPlan { width: 100%; height: 100%; display: block; border-radius: 6px; touch-action: none; cursor: grab; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px; }
+.why { margin: 0; padding-left: 18px; font-size: 13px; display: grid; gap: 3px; }
+.why:empty { display: none; }
+
+/* 3d */
+.three { display: grid; gap: 10px; }
+#view3d { width: 100%; height: clamp(300px, 52vw, 520px); border-radius: 8px; overflow: hidden; background: var(--ground); position: relative; }
+#view3d canvas { display: block; width: 100% !important; height: 100% !important; }
+.empty3d { display: grid; place-items: center; height: 100%; color: var(--muted); text-align: center; padding: 16px; }
+.slider { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.slider input[type=range] { flex: 1 1 240px; accent-color: var(--canopy); }
+.export { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toast { font-size: 12.5px; color: var(--canopy); }
+.foot { color: var(--muted); font-size: 12px; max-width: 90ch; margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Cooler Estates · <span id="stageName">Massing</span></h1>
+      <p id="stageDesc"></p>
+    </div>
+    <div class="status">
+      <a class="btn" href="./index.html">About the project</a>
+      <div class="seg" role="group" aria-label="Stage">
+        <button type="button" id="go1" aria-pressed="true">1 · Massing</button>
+        <button type="button" id="go2" aria-pressed="false">2 · Landscape</button>
+      </div>
+      <span class="status" id="lsStatus" hidden>
+        <span class="chip" id="src"><span class="dot"></span><span>Loading</span></span>
+        <span class="chip" id="rec" title=""><span class="dot"></span><span>Reconcile</span></span>
+        <label class="btn filebtn" for="file">Load layout JSON<input type="file" id="file" accept=".json,application/json"></label>
+      </span>
+    </div>
+  </header>
+
+  <!-- ================= stage 1 · massing ================= -->
+  <div class="stage" id="stage1">
+    <section class="panel" aria-label="Planning brief">
+      <div class="toolbar">
+        <h2>Planning brief</h2>
+        <div class="export">
+          <span class="readout" id="mProg"></span>
+          <button type="button" class="btn" id="mShuffle" hidden>Shuffle</button>
+          <button type="button" class="btn primary" id="mGen">Generate 6 options</button>
+        </div>
+      </div>
+      <div class="brief" id="mBrief"></div>
+      <p class="foot">Pre-filled from the planning authority’s brief. The highlighted inputs are editable — they are the ones that drive the shade result; the rest are compliance checks.</p>
+    </section>
+
+    <div class="main">
+      <aside class="rail" aria-label="Massing options">
+        <h2>Baseline · conventional east–west slabs</h2>
+        <div class="card" id="mBaseline"></div>
+        <h2 style="margin-top:6px">Six options · ranked by outdoor shade</h2>
+        <p class="readout" style="margin:0">Generative search: each typology samples about a thousand layouts, refines the best ones and keeps the layout with the most outdoor shade.</p>
+        <div id="mOptions" class="rail"></div>
+      </aside>
+
+      <section class="panel" aria-label="Massing plan">
+        <div class="toolbar">
+          <h2 id="mTitle">Plan</h2>
+          <div class="seg" id="mTimeSeg" role="group" aria-label="Time"></div>
+        </div>
+        <div class="toolbar">
+          <span class="readout" id="mHint">Drag a block to move it. Select one to rotate it or change its storeys.</span>
+          <div class="seg" role="group" aria-label="Edit block">
+            <button type="button" id="mRotL" title="Rotate 15° anticlockwise">↺ 15°</button>
+            <button type="button" id="mRotR" title="Rotate 15° clockwise">↻ 15°</button>
+            <button type="button" id="mStDn">− storey</button>
+            <button type="button" id="mStUp">+ storey</button>
+            <button type="button" id="mReset">Restore AI option</button>
+          </div>
+        </div>
+        <div class="planwrap"><canvas id="mPlan" aria-label="Massing plan"></canvas><div class="empty2d" id="mEmpty">Generate options, then pick one on the left to inspect and edit it here.</div></div>
+        <div class="legend" id="mLegend"></div>
+        <div class="readout" id="mReadout"></div>
+        <div class="checks" id="mChecks"></div>
+        <ul class="why" id="mWhy"></ul>
+        <div class="export">
+          <button type="button" class="btn" id="mDl" disabled>Download layout JSON</button>
+          <button type="button" class="btn primary" id="mConfirm" disabled>Confirm massing → Landscape</button>
+          <span class="toast" id="mToast" aria-live="polite"></span>
+        </div>
+      </section>
+    </div>
+    <p class="foot">Method: simplified geometric shadow projection of buildings only, equinox design day at 11:00 / 13:00 / 15:00 (each moment stands for 2 h), 2 m grid. Shade J = Σ shaded outdoor area × hours. Not yet included: wind, UTCI, annual sun path; trees come in the landscape stage.</p>
+  </div>
+
+  <!-- ================= stage 2 · landscape ================= -->
+  <div class="stage" id="stage2" hidden>
+    <div class="main">
+      <aside class="rail" aria-label="Landscape schemes">
+        <h2>Baseline · buildings and retained trees only</h2>
+        <div class="card" id="baseline"></div>
+        <h2 style="margin-top:6px">Three schemes · 40 new trees each</h2>
+        <div id="options" class="rail"></div>
+      </aside>
+
+      <section class="panel" aria-label="Site plan">
+        <div class="toolbar">
+          <div class="seg" id="timeSeg" role="group" aria-label="Time"></div>
+          <div class="seg" id="srcSeg" role="group" aria-label="Shade source">
+            <button type="button" id="srcBldg" aria-pressed="false">Buildings only</button>
+            <button type="button" id="srcAll" aria-pressed="true">Buildings + trees</button>
+          </div>
+        </div>
+        <div class="layers" id="layers">
+          <label><input type="checkbox" id="lyShade" checked> Shade</label>
+          <label><input type="checkbox" id="lyAreas" checked> Activity areas</label>
+          <label><input type="checkbox" id="lyPaths" checked> Paths</label>
+          <label><input type="checkbox" id="lyTrees" checked> Trees</label>
+          <label><input type="checkbox" id="lySeats" checked> Seats</label>
+        </div>
+        <div class="planwrap"><canvas id="plan" aria-label="Site plan"></canvas><div class="tip" id="tip" hidden></div></div>
+        <div class="legend" id="legend"></div>
+        <div class="readout" id="readout"></div>
+      </section>
+    </div>
+
+    <section class="panel three" aria-label="3D model">
+      <div class="toolbar">
+        <h2 id="title3d">3D model</h2>
+        <div class="export">
+          <button type="button" class="btn" id="copyJson" disabled>Copy JSON</button>
+          <button type="button" class="btn" id="dlJson" disabled>Download JSON</button>
+          <button type="button" class="btn primary" id="handoff" disabled>Confirm scheme</button>
+          <span class="toast" id="toast" aria-live="polite"></span>
+        </div>
+      </div>
+      <div id="view3d"><div class="empty3d" id="empty3d">Loading 3D…</div></div>
+      <div class="slider">
+        <label for="hour" class="readout">Time</label>
+        <input type="range" id="hour" min="10" max="16" step="0.25" value="13">
+        <span class="mono" id="hourOut">13:00</span>
+        <span class="readout" id="sunOut"></span>
+      </div>
+      <p class="foot">Method: simplified geometric projection, equinox design day at 11:00 / 13:00 / 15:00, each moment standing for 2 h. Shade = 1 − Π transmissivity (buildings 0, trees 0.2); shade ≥ 0.8 counts as shaded. New trees: crown radius 5 m, crown height 8 m. Shade is a geometric obstruction ratio, not a thermal-comfort index. In 3D, sun positions other than 11 / 13 / 15 h are computed by formula for display only.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+/* ===== Cooler Estates · Landscape core (pure functions, no DOM) ===== */
+(function (root) {
+  'use strict';
+
+  const TAU_TREE = 0.2;
+  const NEW_TREE = { r: 5, h: 8 };
+  const TREE_BUDGET = 40;
+  const SHADED = 0.8;
+
+  // ---------- geometry ----------
+  function footprint(b) {
+    const t = b.rot * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+    return [[-b.w / 2, -b.d / 2], [b.w / 2, -b.d / 2], [b.w / 2, b.d / 2], [-b.w / 2, b.d / 2]]
+      .map(([dx, dy]) => [b.x + dx * c - dy * s, b.y + dx * s + dy * c]);
+  }
+  function pip(x, y, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      // edge convention matches the architecture side: a centre exactly on a top edge counts as inside, on a bottom edge as outside
+      if ((yi >= y) !== (yj >= y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function convexHull(pts) {
+    const p = pts.map(q => [q[0], q[1]]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const q of p) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+    for (let i = p.length - 1; i >= 0; i--) { const q = p[i]; while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  }
+  function simplify(pts, tol) { // Douglas-Peucker
+    if (pts.length < 3) return pts.slice();
+    const keep = new Uint8Array(pts.length); keep[0] = keep[pts.length - 1] = 1;
+    const stack = [[0, pts.length - 1]];
+    while (stack.length) {
+      const [a, b] = stack.pop(); let best = -1, bd = 0;
+      const [ax, ay] = pts[a], [bx, by] = pts[b], L = Math.hypot(bx - ax, by - ay) || 1e-9;
+      for (let i = a + 1; i < b; i++) {
+        const d = Math.abs((bx - ax) * (ay - pts[i][1]) - (ax - pts[i][0]) * (by - ay)) / L;
+        if (d > bd) { bd = d; best = i; }
+      }
+      if (bd > tol) { keep[best] = 1; stack.push([a, best], [best, b]); }
+    }
+    return pts.filter((_, i) => keep[i]);
+  }
+
+  // ---------- grid ----------
+  function makeGrid(layout) {
+    const g = layout.site.gridSize || 2;
+    const xs = layout.site.polygon.map(p => p[0]), ys = layout.site.polygon.map(p => p[1]);
+    const W = Math.max(...xs), H = Math.max(...ys);
+    const nx = Math.round(W / g), ny = Math.round(H / g);
+    return { g, nx, ny, n: nx * ny, W, H,
+      cx: i => (i + 0.5) * g, cy: j => (j + 0.5) * g,
+      idx: (x, y) => { const i = Math.floor(x / g), j = Math.floor(y / g); return (i < 0 || j < 0 || i >= nx || j >= ny) ? -1 : j * nx + i; } };
+  }
+  function polyMask(G, poly, out, val) {
+    const m = out || new Uint8Array(G.n);
+    const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
+    const i0 = Math.max(0, Math.floor(Math.min(...xs) / G.g)), i1 = Math.min(G.nx - 1, Math.floor(Math.max(...xs) / G.g));
+    const j0 = Math.max(0, Math.floor(Math.min(...ys) / G.g)), j1 = Math.min(G.ny - 1, Math.floor(Math.max(...ys) / G.g));
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++)
+      if (pip(G.cx(i), G.cy(j), poly)) m[j * G.nx + i] = val == null ? 1 : val;
+    return m;
+  }
+  // chamfer distance transform (metres) from source cells
+  function distField(G, src) {
+    const D = new Float32Array(G.n).fill(1e9), a = G.g, b = G.g * Math.SQRT2, nx = G.nx, ny = G.ny;
+    for (let k = 0; k < G.n; k++) if (src[k]) D[k] = 0;
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+      const k = j * nx + i; let d = D[k];
+      if (i > 0) d = Math.min(d, D[k - 1] + a);
+      if (j > 0) { d = Math.min(d, D[k - nx] + a); if (i > 0) d = Math.min(d, D[k - nx - 1] + b); if (i < nx - 1) d = Math.min(d, D[k - nx + 1] + b); }
+      D[k] = d;
+    }
+    for (let j = ny - 1; j >= 0; j--) for (let i = nx - 1; i >= 0; i--) {
+      const k = j * nx + i; let d = D[k];
+      if (i < nx - 1) d = Math.min(d, D[k + 1] + a);
+      if (j < ny - 1) { d = Math.min(d, D[k + nx] + a); if (i < nx - 1) d = Math.min(d, D[k + nx + 1] + b); if (i > 0) d = Math.min(d, D[k + nx - 1] + b); }
+      D[k] = d;
+    }
+    return D;
+  }
+
+  // ---------- preprocessing ----------
+  function prepare(layout) {
+    const G = makeGrid(layout);
+    const inSite = polyMask(G, layout.site.polygon);
+    const inBuilding = new Uint8Array(G.n), voidDeck = new Uint8Array(G.n), blocked = new Uint8Array(G.n);
+    const fps = layout.buildings.map(b => {
+      const f = footprint(b);
+      polyMask(G, f, inBuilding);
+      if (b.voidDeck) polyMask(G, f, voidDeck); else polyMask(G, f, blocked);
+      return f;
+    });
+    const outdoor = new Uint8Array(G.n);
+    for (let k = 0; k < G.n; k++) outdoor[k] = inSite[k] && !inBuilding[k] ? 1 : 0;
+    const sun = layout.sun.map(s => ({ ...s, alt: +s.alt, az: +s.az, hours: +s.hours || 2 }));
+    const hoursTotal = sun.reduce((a, s) => a + s.hours, 0);
+    // building shade masks per sun time
+    const bShade = sun.map(s => {
+      const m = new Uint8Array(G.n);
+      const a = s.alt * Math.PI / 180, z = s.az * Math.PI / 180;
+      layout.buildings.forEach((b, bi) => {
+        const k = b.h / Math.tan(a), ox = -Math.sin(z) * k, oy = -Math.cos(z) * k;
+        const f = fps[bi];
+        polyMask(G, convexHull(f.concat(f.map(p => [p[0] + ox, p[1] + oy]))), m);
+      });
+      for (let k = 0; k < G.n; k++) m[k] = m[k] && inSite[k] ? 1 : 0;
+      return m;
+    });
+    const bShadeAvg = new Float32Array(G.n);
+    sun.forEach((s, t) => { for (let k = 0; k < G.n; k++) bShadeAvg[k] += bShade[t][k] * s.hours / hoursTotal; });
+    const distBuilding = distField(G, inBuilding);
+    const t13 = sun.findIndex(s => String(s.time).startsWith('13'));
+    return { layout, G, inSite, inBuilding, voidDeck, blocked, outdoor, fps, sun, hoursTotal, bShade, bShadeAvg, distBuilding,
+      t13: t13 >= 0 ? t13 : sun.reduce((bi, s, i, arr) => s.alt > arr[bi].alt ? i : bi, 0) };
+  }
+
+  // ---------- shade ----------
+  function treeShadowCells(P, tree, t) {
+    const { G } = P, s = P.sun[t];
+    const a = s.alt * Math.PI / 180, z = s.az * Math.PI / 180, k = tree.h / Math.tan(a);
+    const cx = tree.x - Math.sin(z) * k, cy = tree.y - Math.cos(z) * k, r = tree.r, r2 = r * r;
+    const out = [];
+    const i0 = Math.max(0, Math.floor((cx - r) / G.g)), i1 = Math.min(G.nx - 1, Math.floor((cx + r) / G.g));
+    const j0 = Math.max(0, Math.floor((cy - r) / G.g)), j1 = Math.min(G.ny - 1, Math.floor((cy + r) / G.g));
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+      const dx = G.cx(i) - cx, dy = G.cy(j) - cy;
+      if (dx * dx + dy * dy <= r2) out.push(j * G.nx + i);
+    }
+    return out;
+  }
+  // transmissivity product per time (1 = open sky)
+  function transField(P, trees) {
+    const { G } = P;
+    return P.sun.map((_, t) => {
+      const T = new Float32Array(G.n).fill(1);
+      for (let k = 0; k < G.n; k++) if (P.bShade[t][k]) T[k] = 0;
+      for (const tr of trees) for (const k of treeShadowCells(P, tr, t)) T[k] *= (tr.tau ?? TAU_TREE);
+      return T;
+    });
+  }
+  function shadeField(P, trees) {
+    return transField(P, trees).map(T => { const S = new Float32Array(T.length); for (let k = 0; k < T.length; k++) S[k] = 1 - T[k]; return S; });
+  }
+  function shadeAt(P, S, k) { // hour-weighted mean shade at cell (void deck / building = sheltered)
+    if (P.inBuilding[k]) return 1;
+    let v = 0; P.sun.forEach((s, t) => { v += S[t][k] * s.hours; }); return v / P.hoursTotal;
+  }
+
+  // reconciliation: building-only shaded areas
+  function reconcile(P) {
+    const { G } = P, cellA = G.g * G.g;
+    let out = 0; for (let k = 0; k < G.n; k++) out += P.outdoor[k];
+    const perTime = P.sun.map((s, t) => { let c = 0; for (let k = 0; k < G.n; k++) if (P.outdoor[k] && P.bShade[t][k]) c++; return c * cellA; });
+    const J = perTime.reduce((a, A, t) => a + A * P.sun[t].hours, 0);
+    return { outdoorArea: out * cellA, perTime, J };
+  }
+
+  // ---------- step 1: paths (A*) ----------
+  function astar(P, start, goal, onPath) {
+    const { G } = P, nx = G.nx, ny = G.ny;
+    const passable = k => P.inSite[k] && !P.blocked[k];
+    const gS = new Float32Array(G.n).fill(Infinity), from = new Int32Array(G.n).fill(-1), closed = new Uint8Array(G.n);
+    const gi = goal % nx, gj = Math.floor(goal / nx);
+    const h = k => { const dx = Math.abs(k % nx - gi), dy = Math.abs(Math.floor(k / nx) - gj); return 0.5 * G.g * (Math.max(dx, dy) + (Math.SQRT2 - 1) * Math.min(dx, dy)); };
+    const heap = []; // binary heap of [f, k]
+    const push = (f, k) => { heap.push([f, k]); let i = heap.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+    const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
+    gS[start] = 0; push(h(start), start);
+    const nb = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, Math.SQRT2], [1, -1, Math.SQRT2], [-1, 1, Math.SQRT2], [-1, -1, Math.SQRT2]];
+    while (heap.length) {
+      const [, k] = pop(); if (closed[k]) continue; closed[k] = 1;
+      if (k === goal) break;
+      const i = k % nx, j = Math.floor(k / nx);
+      for (const [di, dj, w] of nb) {
+        const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= nx || jj >= ny) continue;
+        const q = jj * nx + ii; if (closed[q] || !passable(q)) continue;
+        if (di && dj && (!passable(j * nx + ii) || !passable(jj * nx + i))) continue; // no corner cutting
+        const c = gS[k] + w * G.g * (onPath[q] ? 0.5 : 1);
+        if (c < gS[q]) { gS[q] = c; from[q] = k; push(c + h(q), q); }
+      }
+    }
+    if (from[goal] < 0 && goal !== start) return null;
+    const cells = []; for (let k = goal; k >= 0; k = from[k]) { cells.push(k); if (k === start) break; }
+    return cells.reverse();
+  }
+  function nearestPassable(P, x, y) {
+    const { G } = P; let best = -1, bd = Infinity;
+    for (let k = 0; k < G.n; k++) {
+      if (!P.inSite[k] || P.blocked[k]) continue;
+      const d = (G.cx(k % G.nx) - x) ** 2 + (G.cy(Math.floor(k / G.nx)) - y) ** 2;
+      if (d < bd) { bd = d; best = k; }
+    }
+    return best;
+  }
+  function buildPaths(P) {
+    const { G, layout } = P;
+    const onPath = new Uint8Array(G.n), pathCount = new Uint8Array(G.n);
+    const origins = (layout.site.entrances || []).filter(e => e.type !== 'vehicle');
+    const homes = layout.buildings.map((b, i) => ({ b, f: P.fps[i] })).filter(o => o.b.type === 'residential');
+    const paths = []; let n = 1;
+    for (const e of origins) {
+      const s = nearestPassable(P, e.x, e.y);
+      // nearer buildings first so trunks form toward them
+      const ordered = homes.slice().sort((A, B) => Math.hypot(A.b.x - e.x, A.b.y - e.y) - Math.hypot(B.b.x - e.x, B.b.y - e.y));
+      for (const { b, f } of ordered) {
+        let door = null, bd = Infinity;
+        for (let i = 0; i < 4; i++) {
+          const m = [(f[i][0] + f[(i + 1) % 4][0]) / 2, (f[i][1] + f[(i + 1) % 4][1]) / 2];
+          const ox = m[0] - b.x, oy = m[1] - b.y, L = Math.hypot(ox, oy) || 1;
+          const d = [m[0] + ox / L * 1.5, m[1] + oy / L * 1.5];
+          const dist = Math.hypot(d[0] - e.x, d[1] - e.y);
+          if (dist < bd) { bd = dist; door = d; }
+        }
+        const goal = nearestPassable(P, door[0], door[1]);
+        const cells = astar(P, s, goal, onPath);
+        if (!cells) continue;
+        cells.forEach(k => { onPath[k] = 1; pathCount[k]++; });
+        const pts = cells.map(k => [G.cx(k % G.nx), G.cy(Math.floor(k / G.nx))]);
+        paths.push({ id: 'W' + (n++), from: e.id, to: b.id, cells, polyline: simplify(pts, 1).map(p => [+p[0].toFixed(1), +p[1].toFixed(1)]) });
+      }
+    }
+    // junctions: where a shared trunk splits
+    const junction = new Uint8Array(G.n);
+    for (let k = 0; k < G.n; k++) if (pathCount[k] >= 2) {
+      const i = k % G.nx, j = Math.floor(k / G.nx);
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+        const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= G.nx || jj >= G.ny) continue;
+        const q = jj * G.nx + ii; if (pathCount[q] && pathCount[q] < pathCount[k]) { junction[k] = 1; break; }
+      }
+    }
+    P.onPath = onPath; P.pathCount = pathCount; P.paths = paths;
+    P.distPath = distField(G, onPath);
+    P.distJunction = distField(G, junction.some(v => v) ? junction : onPath);
+    return paths;
+  }
+
+  // ---------- step 2: activity areas ----------
+  const AREA_ORDER = ['plaza', 'playground', 'fitness', 'community_garden'];
+  function placeAreas(P) {
+    const { G, layout } = P;
+    const areaMask = new Uint8Array(G.n), areaType = new Array(G.n).fill(null);
+    const e2 = (layout.site.entrances || []).find(e => e.type === 'bus_stop') || (layout.site.entrances || [])[0] || { x: G.W / 2, y: G.H / 2 };
+    const res = layout.buildings.filter(b => b.type === 'residential');
+    const near = (d, D) => 1 - Math.min(d / D, 1);
+    const program = (layout.program || []).slice().sort((a, b) => AREA_ORDER.indexOf(a.type) - AREA_ORDER.indexOf(b.type));
+    const areas = [];
+    for (const item of program) {
+      let best = null;
+      for (const ar of [1, 1.5, 1 / 1.5]) {
+        const w = Math.sqrt(item.area * ar), d = item.area / w;
+        for (let x0 = 0; x0 + w <= G.W; x0 += 4) for (let y0 = 0; y0 + d <= G.H; y0 += 4) {
+          const cells = []; let ok = true, sh = 0, minPath = Infinity, minJ = Infinity;
+          const i0 = Math.ceil(x0 / G.g - 0.5), i1 = Math.floor((x0 + w) / G.g - 0.5);
+          const j0 = Math.ceil(y0 / G.g - 0.5), j1 = Math.floor((y0 + d) / G.g - 0.5);
+          for (let j = j0; j <= j1 && ok; j++) for (let i = i0; i <= i1; i++) {
+            const k = j * G.nx + i;
+            if (!P.outdoor[k] || areaMask[k] || P.distPath[k] < 2 || P.distBuilding[k] < 3) { ok = false; break; }
+            cells.push(k); sh += P.bShadeAvg[k]; minPath = Math.min(minPath, P.distPath[k]); minJ = Math.min(minJ, P.distJunction[k]);
+          }
+          if (!ok || !cells.length) continue;
+          sh /= cells.length;
+          const cx = x0 + w / 2, cy = y0 + d / 2;
+          let score;
+          switch (item.type) {
+            case 'plaza': score = 0.5 * near(Math.hypot(cx - e2.x, cy - e2.y), 150) + 0.5 * near(minJ, 40); break;
+            case 'playground': {
+              const dRes = Math.min(...res.map(b => Math.hypot(cx - b.x, cy - b.y) - Math.max(b.w, b.d) / 2));
+              score = 0.6 * sh + 0.4 * (dRes <= 40 ? 1 : near(dRes - 40, 60)); break;
+            }
+            case 'fitness': score = 0.6 * near(minPath, 15) + 0.4 * sh; break;
+            case 'community_garden': score = 0.7 * (1 - sh) + 0.3 * near(minPath, 15); break;
+            default: score = 0.5 * near(minPath, 15) + 0.5 * sh;
+          }
+          if (!best || score > best.score) best = { score, cells, x0, y0, w, d, sh };
+        }
+      }
+      if (!best) continue;
+      best.cells.forEach(k => { areaMask[k] = 1; areaType[k] = item.type; });
+      const { x0, y0, w, d } = best;
+      areas.push({ type: item.type, area: item.area, x0, y0, w, d, buildingShade: best.sh,
+        polygon: [[x0, y0], [x0 + w, y0], [x0 + w, y0 + d], [x0, y0 + d]].map(p => [+p[0].toFixed(1), +p[1].toFixed(1)]) });
+    }
+    P.areaMask = areaMask; P.areaType = areaType; P.areas = areas;
+    return areas;
+  }
+
+  // ---------- step 3: seat slots ----------
+  function seatLegal(P, k) { return k >= 0 && P.outdoor[k] && !P.onPath[k] && P.areaType[k] !== 'community_garden'; }
+  function buildSeatSlots(P) {
+    const { G } = P, slots = [];
+    const add = (x, y, src) => { const k = G.idx(x, y); if (seatLegal(P, k)) slots.push({ x, y, src }); };
+    for (const a of P.areas) {
+      const { x0, y0, w, d } = a, ins = 0.8;
+      const along = (n, side) => { for (let i = 1; i <= n; i++) { const f = i / (n + 1);
+        if (side === 'S') add(x0 + w * f, y0 + ins, a.type); if (side === 'N') add(x0 + w * f, y0 + d - ins, a.type);
+        if (side === 'W') add(x0 + ins, y0 + d * f, a.type); if (side === 'E') add(x0 + w - ins, y0 + d * f, a.type); } };
+      const long = w >= d ? ['S', 'N'] : ['W', 'E'], short = w >= d ? ['W', 'E'] : ['S', 'N'];
+      if (a.type === 'plaza') { ['S', 'N', 'W', 'E'].forEach(s => along(2, s)); }
+      else if (a.type === 'playground') { long.forEach(s => along(2, s)); short.forEach(s => along(1, s)); }
+      else if (a.type === 'fitness') { long.forEach(s => along(1, s)); }
+    }
+    // rest stops every 40 m along paths
+    for (const p of P.paths) {
+      const pts = p.cells.map(k => [G.cx(k % G.nx), G.cy(Math.floor(k / G.nx))]);
+      let acc = 0;
+      for (let i = 1; i < pts.length; i++) {
+        acc += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+        if (acc < 40) continue;
+        acc = 0;
+        if (slots.some(s => s.src === 'path' && Math.hypot(s.x - pts[i][0], s.y - pts[i][1]) < 15)) continue;
+        const a = pts[Math.max(0, i - 2)], b = pts[Math.min(pts.length - 1, i + 2)];
+        const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
+        for (const sgn of [1, -1]) { const x = pts[i][0] + nx * 2.5 * sgn, y = pts[i][1] + ny * 2.5 * sgn;
+          if (seatLegal(P, G.idx(x, y))) { slots.push({ x, y, src: 'path' }); break; } }
+      }
+    }
+    P.seatSlots = slots;
+    return slots;
+  }
+  function adjustSeats(P, S, trees) {
+    const { G } = P, taken = [];
+    return P.seatSlots.map(sl => {
+      let best = null;
+      const R = 4, i0 = Math.floor((sl.x - R) / G.g), i1 = Math.floor((sl.x + R) / G.g), j0 = Math.floor((sl.y - R) / G.g), j1 = Math.floor((sl.y + R) / G.g);
+      for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+        if (i < 0 || j < 0 || i >= G.nx || j >= G.ny) continue;
+        const k = j * G.nx + i, x = G.cx(i), y = G.cy(j), dist = Math.hypot(x - sl.x, y - sl.y);
+        if (dist > R || !seatLegal(P, k)) continue;
+        if (trees.some(t => Math.hypot(t.x - x, t.y - y) < 1)) continue;
+        if (taken.some(t => Math.hypot(t[0] - x, t[1] - y) < 1.9)) continue;
+        const v = shadeAt(P, S, k) - dist * 0.005; // tie-break toward the slot
+        if (!best || v > best.v) best = { v, x, y, k };
+      }
+      const seat = best ? { x: best.x, y: best.y, k: best.k } : { x: sl.x, y: sl.y, k: G.idx(sl.x, sl.y) };
+      taken.push([seat.x, seat.y]);
+      seat.src = sl.src;
+      seat.perTime = P.sun.map((_, t) => +S[t][seat.k].toFixed(2));
+      return seat;
+    });
+  }
+
+  // ---------- step 4: tree strategies ----------
+  function treeOk(P, x, y, placed) {
+    const { G } = P, k = G.idx(x, y), r = NEW_TREE.r;
+    if (k < 0 || !P.outdoor[k]) return false;
+    if (P.distBuilding[k] < 3 || P.distPath[k] < 2) return false;
+    if (P.areaType[k] === 'community_garden') return false;
+    if (x - r < 0 || y - r < 0 || x + r > G.W || y + r > G.H) return false;
+    for (const t of placed) if (Math.hypot(t.x - x, t.y - y) < 6) return false;
+    return true;
+  }
+  function existingTrees(P) { return (P.layout.site.existingTrees || []).map(t => ({ ...t, existing: true })); }
+
+  function strategyA(P, baseS) { // shade corridor
+    const { G } = P, placed = existingTrees(P), out = [], seen = new Set();
+    const samples = [];
+    for (const p of P.paths) {
+      const pts = p.cells.map(k => [G.cx(k % G.nx), G.cy(Math.floor(k / G.nx))]);
+      let acc = 8;
+      for (let i = 0; i < pts.length; i++) {
+        if (i) acc += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+        if (acc < 8) continue; acc = 0;
+        const k = p.cells[i]; if (seen.has(k)) continue; seen.add(k);
+        if (P.inBuilding[k]) continue; // under void deck: already sheltered
+        const a = pts[Math.max(0, i - 2)], b = pts[Math.min(pts.length - 1, i + 2)];
+        const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+        samples.push({ x: pts[i][0], y: pts[i][1], nx: -dy / L, ny: dx / L, exp: shadeAt(P, baseS, k) });
+      }
+    }
+    samples.sort((a, b) => a.exp - b.exp);
+    let side = 1;
+    for (const s of samples) {
+      if (out.length >= TREE_BUDGET) break;
+      for (const sg of [side, -side]) {
+        const x = s.x + s.nx * 3 * sg, y = s.y + s.ny * 3 * sg;
+        if (treeOk(P, x, y, placed)) { const t = { x: +x.toFixed(1), y: +y.toFixed(1), ...NEW_TREE }; placed.push(t); out.push(t); side = -side; break; }
+      }
+    }
+    return out;
+  }
+
+  function strategyB(P) { // activity first
+    const placed = existingTrees(P), out = [];
+    const order = ['playground', 'plaza', 'fitness'];
+    for (const type of order) for (const a of P.areas.filter(a => a.type === type)) {
+      const e = 3, sp = 7, X0 = a.x0 - e, Y0 = a.y0 - e, W = a.w + 2 * e, D = a.d + 2 * e;
+      const nI = Math.floor(W / sp), nJ = Math.floor(D / sp);
+      const ox = X0 + (W - nI * sp) / 2, oy = Y0 + (D - nJ * sp) / 2;
+      for (let j = 0; j <= nJ; j++) for (let i = 0; i <= nI; i++) {
+        if (out.length >= TREE_BUDGET) break;
+        const x = ox + i * sp, y = oy + j * sp;
+        if (treeOk(P, x, y, placed)) { const t = { x: +x.toFixed(1), y: +y.toFixed(1), ...NEW_TREE }; placed.push(t); out.push(t); }
+      }
+    }
+    // remaining budget: next to seat slots without a tree nearby
+    let guard = 0;
+    while (out.length < TREE_BUDGET && guard++ < 5) {
+      let added = 0;
+      for (const sl of P.seatSlots) {
+        if (out.length >= TREE_BUDGET) break;
+        if (placed.some(t => Math.hypot(t.x - sl.x, t.y - sl.y) < 6)) continue;
+        let best = null;
+        for (let r = 2.5; r <= 6 && !best; r += 1.5) for (let q = 0; q < 12; q++) {
+          const ang = q * Math.PI / 6, x = sl.x + r * Math.cos(ang), y = sl.y + r * Math.sin(ang);
+          if (treeOk(P, x, y, placed)) { best = { x, y }; break; }
+        }
+        if (best) { const t = { x: +best.x.toFixed(1), y: +best.y.toFixed(1), ...NEW_TREE }; placed.push(t); out.push(t); added++; }
+      }
+      if (!added) break;
+    }
+    return out;
+  }
+
+  function weightMap(P) {
+    const { G } = P, W = new Float32Array(G.n);
+    const nearSlot = new Uint8Array(G.n);
+    for (const sl of P.seatSlots) {
+      const R = 4;
+      for (let j = Math.floor((sl.y - R) / G.g); j <= Math.floor((sl.y + R) / G.g); j++)
+        for (let i = Math.floor((sl.x - R) / G.g); i <= Math.floor((sl.x + R) / G.g); i++) {
+          if (i < 0 || j < 0 || i >= G.nx || j >= G.ny) continue;
+          if (Math.hypot(G.cx(i) - sl.x, G.cy(j) - sl.y) <= R) nearSlot[j * G.nx + i] = 1;
+        }
+    }
+    for (let k = 0; k < G.n; k++) {
+      if (!P.outdoor[k]) continue;
+      const at = P.areaType[k];
+      if (at === 'community_garden') { W[k] = -0.5; continue; }
+      let w = 0.1;
+      if (P.onPath[k] || at === 'plaza' || at === 'fitness') w = 1;
+      if (at === 'playground' || nearSlot[k]) w = 2;
+      W[k] = w;
+    }
+    return W;
+  }
+  function strategyC(P) { // weighted greedy
+    const { G } = P, W = weightMap(P), placed = existingTrees(P), out = [];
+    const T = transField(P, placed);
+    const cand = [];
+    for (let k = 0; k < G.n; k++) { const x = G.cx(k % G.nx), y = G.cy(Math.floor(k / G.nx)); if (treeOk(P, x, y, [])) cand.push({ x, y, cells: P.sun.map((_, t) => treeShadowCells(P, { x, y, ...NEW_TREE }, t)) }); }
+    for (let it = 0; it < TREE_BUDGET; it++) {
+      let best = null, bg = 0;
+      for (const c of cand) {
+        if (c.dead) continue;
+        let ok = true; for (const t of placed) if (Math.hypot(t.x - c.x, t.y - c.y) < 6) { ok = false; break; }
+        if (!ok) { c.dead = true; continue; }
+        let gain = 0;
+        P.sun.forEach((s, t) => { let g = 0; for (const k of c.cells[t]) g += W[k] * T[t][k]; gain += g * (1 - TAU_TREE) * s.hours; });
+        if (gain > bg) { bg = gain; best = c; }
+      }
+      if (!best) break;
+      const tr = { x: best.x, y: best.y, ...NEW_TREE };
+      placed.push(tr); out.push(tr);
+      P.sun.forEach((_, t) => { for (const k of best.cells[t]) T[t][k] *= TAU_TREE; });
+    }
+    return out;
+  }
+
+  // ---------- step 5: metrics ----------
+  function metrics(P, newTrees) {
+    const { G } = P, cellA = G.g * G.g;
+    const trees = existingTrees(P).concat(newTrees);
+    const S = shadeField(P, trees);
+    let J = 0, s13 = 0;
+    P.sun.forEach((s, t) => { for (let k = 0; k < G.n; k++) if (P.outdoor[k]) J += S[t][k] * cellA * s.hours; });
+    for (let k = 0; k < G.n; k++) if (P.outdoor[k] && S[P.t13][k] >= SHADED) s13 += cellA;
+    const seats = adjustSeats(P, S, trees);
+    let hit = 0;
+    seats.forEach(st => P.sun.forEach((s, t) => { if (st.perTime[t] >= SHADED) hit += s.hours; }));
+    const seatShadeRatio = seats.length ? hit / (seats.length * P.hoursTotal) : 0;
+    let maxRun = 0, runAt = null;
+    for (const p of P.paths) {
+      let run = 0, startI = 0;
+      for (let i = 0; i < p.cells.length; i++) {
+        const k = p.cells[i];
+        if (shadeAt(P, S, k) < 0.5) {
+          if (i > 0 && run > 0) { const a = p.cells[i - 1]; run += (a % G.nx !== k % G.nx && Math.floor(a / G.nx) !== Math.floor(k / G.nx)) ? G.g * Math.SQRT2 : G.g; }
+          else { run = G.g; startI = i; }
+          if (run > maxRun) { maxRun = run; runAt = { path: p.id, from: startI, to: i }; }
+        } else run = 0;
+      }
+    }
+    return { S, seats, trees, score: {
+      seatShadeRatio: +seatShadeRatio.toFixed(3), maxExposedRun_m: Math.round(maxRun),
+      shadeArea_m2h: Math.round(J), shade1300_m2: Math.round(s13) }, runAt };
+  }
+
+  const STRATEGIES = [
+    { id: 'A', name: 'Shade corridors', idea: 'Walking first: plant along both sides of the most exposed paths.', run: (P, baseS) => strategyA(P, baseS) },
+    { id: 'B', name: 'Activity first', idea: 'Staying first: tree grids over the playground, plaza and fitness area.', run: P => strategyB(P) },
+    { id: 'C', name: 'Weighted optimisation', idea: 'Greedy placement, tree by tree, maximising weighted shade on seats, paths and the playground.', run: P => strategyC(P) }
+  ];
+
+  function runAll(layout) {
+    const t0 = Date.now();
+    const P = prepare(layout);
+    const rec = reconcile(P);
+    buildPaths(P); placeAreas(P); buildSeatSlots(P);
+    const baseline = metrics(P, []);
+    const options = STRATEGIES.map(st => {
+      const trees = st.run(P, baseline.S);
+      const m = metrics(P, trees);
+      return { id: st.id, name: st.name, idea: st.idea, newTrees: trees, ...m };
+    });
+    return { P, rec, baseline, options, ms: Date.now() - t0 };
+  }
+
+  function landscapeJSON(R, opt) {
+    return {
+      strategy: opt.id,
+      activityAreas: R.P.areas.map(a => ({ polygon: a.polygon, type: a.type })),
+      paths: R.P.paths.map(p => ({ id: p.id, polyline: p.polyline, from: p.from, to: p.to })),
+      trees: opt.newTrees.map(t => ({ x: t.x, y: t.y, r: t.r, h: t.h })),
+      seats: opt.seats.map(s => ({ x: s.x, y: s.y })),
+      score: { ...opt.score, baseline: R.baseline.score }
+    };
+  }
+
+  // NOAA-style sun position for the 3D slider (display only)
+  function sunPosition(dateStr, hour, lat = 1.35, lon = 103.82, utc = 8) {
+    const d = new Date(dateStr + 'T00:00:00Z'), n = Math.floor((d - Date.UTC(d.getUTCFullYear(), 0, 0)) / 864e5);
+    const B = 2 * Math.PI * (n - 81) / 364, eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+    const dec = 23.45 * Math.sin(2 * Math.PI * (284 + n) / 365) * Math.PI / 180;
+    const st = hour + (4 * (lon - 15 * utc) + eot) / 60, H = 15 * (st - 12) * Math.PI / 180, phi = lat * Math.PI / 180;
+    const alt = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H));
+    let az = Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi)) * 180 / Math.PI + 180;
+    return { alt: alt * 180 / Math.PI, az: (az + 360) % 360 };
+  }
+
+  const api = { runAll, landscapeJSON, sunPosition, footprint, SHADED, NEW_TREE, TREE_BUDGET };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.LS = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+
+<script>
+/* ===== Cooler Estates · Massing core (pure functions, no DOM) =====
+   Six typologies, each searched for the layout with the most outdoor shade.
+   Layout format and scoring rules: interface.md */
+(function (root) {
+  'use strict';
+
+  // ---------- site, brief and sun (same values as layout.sample.json) ----------
+  const SITE = {
+    W: 200, H: 200, gridSize: 2,                          // the grid assumes a rectangular site
+    polygon: [[0, 0], [200, 0], [200, 200], [0, 200]],
+    entrances: [
+      { id: 'E1', x: 100, y: 200, type: 'vehicle' },
+      { id: 'E2', x: 190, y: 200, type: 'bus_stop' },
+      { id: 'E3', x: 0,   y: 100, type: 'pedestrian' }
+    ],
+    existingTrees: [
+      { x: 180, y: 80, r: 6, h: 10 },
+      { x: 190, y: 92, r: 6, h: 10 }
+    ]
+  };
+  const SITE_AREA = SITE.W * SITE.H;
+  const PROGRAM = [
+    { type: 'playground',       area: 600 },
+    { type: 'fitness',          area: 300 },
+    { type: 'plaza',            area: 800 },
+    { type: 'community_garden', area: 400 }
+  ];
+  const PROGRAM_AREA = PROGRAM.reduce((s, p) => s + p.area, 0);
+  // Singapore, 2026-03-20 (equinox), NOAA solar position; each moment stands for 2 h
+  const SUN = [
+    { time: '11:00', alt: 56.9, az: 92.4,  hours: 2 },
+    { time: '13:00', alt: 86.6, az: 116.3, hours: 2 },
+    { time: '15:00', alt: 63.0, az: 267.1, hours: 2 }
+  ];
+  // fixed planning rules (placeholder values for the prototype)
+  const RULES = {
+    setback: 7.5, sepRes: 18, sepPark: 12, slabDepth: 15, tower: 24, treeClear: 3,
+    minStoreys: 8, gfaTol: 0.02, greenRatio: 0.3,
+    park: { w: 40, d: 40, storeys: 7, floorHeight: 3.0 }
+  };
+  const SEARCH = { coarseGrid: 4, maxTries: 1500, pool: 80, top: 6, mutations: 50 };
+  const DEFAULT_BRIEF = { gpr: 2.8, maxCoverage: 0.25, maxStoreys: 30, floorHeight: 2.8, greenRatio: RULES.greenRatio };
+  const TYPE_NAME = { slab: 'Parallel slabs', stagger: 'Staggered slabs', tower: 'Point towers', court: 'Semi-courtyard',
+                      perimeter: 'Perimeter block', hybrid: 'Towers + slabs', baseline: 'Conventional layout' };
+
+  const rad = d => d * Math.PI / 180;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const r1 = v => Math.round(v * 10) / 10;
+  const clone = o => JSON.parse(JSON.stringify(o));
+  const normRot = r => ((r + 180) % 360 + 360) % 360 - 180;
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  const gauss = rnd => Math.sqrt(-2 * Math.log(rnd() + 1e-12)) * Math.cos(2 * Math.PI * rnd());
+
+  // ---------- geometry ----------
+  function corners(b) {           // CCW footprint corners of a rotated box
+    const c = Math.cos(rad(b.rot)), s = Math.sin(rad(b.rot)), hw = b.w / 2, hd = b.d / 2;
+    return [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]].map(([u, v]) => [b.x + u * c - v * s, b.y + u * s + v * c]);
+  }
+  function hull(pts) {            // Andrew's monotone chain, CCW
+    const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const q of p) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+    for (let i = p.length - 1; i >= 0; i--) { const q = p[i]; while (up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  }
+  function inConvex(poly, x, y) {
+    for (let i = 0, n = poly.length; i < n; i++) {
+      const [x1, y1] = poly[i], [x2, y2] = poly[(i + 1) % n];
+      if ((x2 - x1) * (y - y1) - (y2 - y1) * (x - x1) < 0) return false;
+    }
+    return true;
+  }
+  function segDist(px, py, ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay;
+    const t = clamp(((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1), 0, 1);
+    return Math.hypot(px - ax - t * dx, py - ay - t * dy);
+  }
+  function overlaps(P, Q) {       // separating axis test for convex polygons
+    for (const poly of [P, Q]) {
+      for (let i = 0; i < poly.length; i++) {
+        const [x1, y1] = poly[i], [x2, y2] = poly[(i + 1) % poly.length];
+        const nx = y1 - y2, ny = x2 - x1;
+        let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+        for (const [x, y] of P) { const d = x * nx + y * ny; a0 = Math.min(a0, d); a1 = Math.max(a1, d); }
+        for (const [x, y] of Q) { const d = x * nx + y * ny; b0 = Math.min(b0, d); b1 = Math.max(b1, d); }
+        if (a1 < b0 || b1 < a0) return false;
+      }
+    }
+    return true;
+  }
+  function polyDist(P, Q) {
+    if (overlaps(P, Q)) return 0;
+    let m = Infinity;
+    for (const [A, B] of [[P, Q], [Q, P]])
+      for (const [px, py] of A)
+        for (let i = 0; i < B.length; i++) {
+          const [ax, ay] = B[i], [bx, by] = B[(i + 1) % B.length];
+          m = Math.min(m, segDist(px, py, ax, ay, bx, by));
+        }
+    return m;
+  }
+
+  // ---------- shade evaluation (interface.md §4), buildings only ----------
+  function fillConvex(poly, g, nx, ny, out) {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const [x, y] of poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    const i0 = Math.max(0, Math.ceil(x0 / g - 0.5)), i1 = Math.min(nx - 1, Math.floor(x1 / g - 0.5));
+    const j0 = Math.max(0, Math.ceil(y0 / g - 0.5)), j1 = Math.min(ny - 1, Math.floor(y1 / g - 0.5));
+    for (let j = j0; j <= j1; j++) {
+      const y = (j + 0.5) * g;
+      for (let i = i0; i <= i1; i++) if (inConvex(poly, (i + 0.5) * g, y)) out[j * nx + i] = 1;
+    }
+  }
+  function evaluate(bs, g) {
+    const nx = Math.round(SITE.W / g), ny = Math.round(SITE.H / g), N = nx * ny, cellA = g * g;
+    const polys = bs.map(corners);
+    const foot = new Uint8Array(N);
+    polys.forEach(p => fillConvex(p, g, nx, ny, foot));
+    let outdoor = 0;
+    for (let k = 0; k < N; k++) if (!foot[k]) outdoor++;
+    const cnt = new Uint8Array(N), masks = [], byTime = {};
+    let J = 0;
+    for (const s of SUN) {
+      const sh = new Uint8Array(N);
+      const k = 1 / Math.tan(rad(s.alt)), ax = -Math.sin(rad(s.az)), ay = -Math.cos(rad(s.az));
+      bs.forEach((b, i) => {
+        const dx = ax * b.h * k, dy = ay * b.h * k, p = polys[i];
+        fillConvex(hull(p.concat(p.map(([x, y]) => [x + dx, y + dy]))), g, nx, ny, sh);
+      });
+      let c = 0;
+      for (let q = 0; q < N; q++) if (sh[q] && !foot[q]) { c++; cnt[q]++; }
+      byTime[s.time] = c * cellA;
+      J += c * cellA * s.hours;
+      masks.push(sh);
+    }
+    return { g, nx, ny, foot, cnt, masks, outdoor: outdoor * cellA, byTime, J };
+  }
+
+  // ---------- planning checks ----------
+  function setbackOK(bs) {
+    const sb = RULES.setback - 1e-6;
+    return bs.every(b => corners(b).every(([x, y]) => x >= sb && y >= sb && x <= SITE.W - sb && y <= SITE.H - sb));
+  }
+  function treesOK(bs) {
+    for (const t of SITE.existingTrees)
+      for (const b of bs) {
+        const p = corners(b);
+        if (inConvex(p, t.x, t.y)) return false;
+        for (let i = 0; i < 4; i++) {
+          const [ax, ay] = p[i], [bx, by] = p[(i + 1) % 4];
+          if (segDist(t.x, t.y, ax, ay, bx, by) < t.r + RULES.treeClear) return false;
+        }
+      }
+    return true;
+  }
+  function separation(bs, early) {
+    const polys = bs.map(corners);
+    let worst = null;
+    for (let i = 0; i < bs.length; i++)
+      for (let j = i + 1; j < bs.length; j++) {
+        if (bs[i].group && bs[i].group === bs[j].group) continue;     // bars of one U-block touch on purpose
+        const need = bs[i].type === 'carpark' || bs[j].type === 'carpark' ? RULES.sepPark : RULES.sepRes;
+        const d = polyDist(polys[i], polys[j]);
+        if (d < need && (!worst || need - d > worst.short)) {
+          worst = { a: bs[i].id, b: bs[j].id, d, short: need - d };
+          if (early) return worst;
+        }
+      }
+    return worst;
+  }
+  const gfaOf = bs => bs.reduce((s, b) => s + (b.type === 'residential' ? b.w * b.d * b.storeys : 0), 0);
+  const coverOf = bs => bs.reduce((s, b) => s + b.w * b.d, 0) / SITE_AREA;
+  function compliance(bs, brief) {
+    const target = brief.gpr * SITE_AREA, gfa = gfaOf(bs), cov = coverOf(bs);
+    const maxSt = Math.max(...bs.filter(b => b.type === 'residential').map(b => b.storeys));
+    const sep = separation(bs, false);
+    return {
+      sepPair: sep ? [sep.a, sep.b] : null,
+      items: [
+        { label: 'GPR ' + (gfa / SITE_AREA).toFixed(2), ok: Math.abs(gfa - target) <= target * RULES.gfaTol },
+        { label: 'Coverage ' + (cov * 100).toFixed(1) + '%', ok: cov <= brief.maxCoverage + 1e-9 },
+        { label: 'Tallest ' + maxSt + ' storeys', ok: maxSt <= brief.maxStoreys },
+        { label: 'Setbacks', ok: setbackOK(bs) },
+        { label: sep ? `Separation ${sep.a}–${sep.b} ${sep.d.toFixed(0)} m` : 'Separation', ok: !sep },
+        { label: 'Retained trees', ok: treesOK(bs) },
+        { label: 'Room for greenery', ok: SITE_AREA * (1 - cov) >= brief.greenRatio * SITE_AREA + PROGRAM_AREA }
+      ]
+    };
+  }
+
+  // Storeys are derived from the plan so the GPR is met by construction (repair, not penalty).
+  function assignStoreys(bs, brief) {
+    const res = bs.filter(b => b.type === 'residential');
+    const target = brief.gpr * SITE_AREA, maxS = brief.maxStoreys, minS = Math.min(RULES.minStoreys, maxS);
+    const A = res.map(b => b.w * b.d);
+    if (A.reduce((s, a) => s + a, 0) * maxS < target * (1 - RULES.gfaTol)) return false;
+    const gfaAt = k => res.reduce((s, b, i) => s + A[i] * clamp(Math.round(k * b.wt), minS, maxS), 0);
+    let lo = 0, hi = 200;
+    for (let it = 0; it < 40; it++) { const mid = (lo + hi) / 2; if (gfaAt(mid) < target) lo = mid; else hi = mid; }
+    res.forEach(b => { b.storeys = clamp(Math.round(hi * b.wt), minS, maxS); });
+    let gfa = res.reduce((s, b, i) => s + A[i] * b.storeys, 0);
+    for (let it = 0; it < 200 && gfa > target; it++) {             // trim overshoot from the relatively tallest block
+      let j = -1;
+      res.forEach((b, i) => { if (b.storeys > minS && (j < 0 || b.storeys / b.wt > res[j].storeys / res[j].wt)) j = i; });
+      if (j < 0 || A[j] / 2 > gfa - target) break;
+      res[j].storeys--; gfa -= A[j];
+    }
+    res.forEach(b => { b.h = r1(b.storeys * brief.floorHeight); });
+    for (const b of bs) if (b.type === 'carpark') { b.storeys = RULES.park.storeys; b.h = RULES.park.storeys * RULES.park.floorHeight; }
+    return Math.abs(gfa - target) <= target * RULES.gfaTol;
+  }
+  function ewFacade(bs) {         // façade area whose normal points within 45° of east or west
+    let a = 0;
+    for (const b of bs)
+      for (const [phi, len] of [[b.rot + 90, b.w], [b.rot - 90, b.w], [b.rot, b.d], [b.rot + 180, b.d]])
+        if (Math.abs(Math.cos(rad(phi))) > Math.SQRT1_2) a += len * b.h;
+    return a;
+  }
+
+  // ---------- typologies: a parameter spec plus a deterministic builder ----------
+  const res = (x, y, w, d, rot, group) => ({ type: 'residential', x, y, w, d, rot, ...(group ? { group } : {}) });
+  const local = (cx, cy, R, u, v) => [cx + u * Math.cos(rad(R)) - v * Math.sin(rad(R)), cy + u * Math.sin(rad(R)) + v * Math.cos(rad(R))];
+  const WTS = n => Object.fromEntries(Array.from({ length: n }, (_, i) => ['w' + i, [0.6, 1.4]]));
+  const CP = { cp: [0, 8, 1], ce: [0, 12] };
+  const OFF = { ox: [-15, 15], oy: [-15, 15] };
+  const XY = (n, lo = 30, hi = 170) => Object.fromEntries(Array.from({ length: n }, (_, i) => [['t' + i + 'x', [lo, hi]], ['t' + i + 'y', [lo, hi]]]).flat());
+  function carpark(p) {
+    const e = p.ce, half = RULES.park.w / 2;
+    const lo = RULES.setback + half + e, hi = SITE.W - RULES.setback - half - e, m = SITE.W / 2;
+    const [x, y] = [[lo, lo], [hi, lo], [lo, hi], [hi, hi], [m, lo], [m, hi], [lo, m], [hi, m], [m, m]][p.cp];
+    return { type: 'carpark', x, y, w: RULES.park.w, d: RULES.park.d, rot: 0 };
+  }
+  const D = RULES.slabDepth, TW = RULES.tower;
+  const TYPES = [
+    { id: 'slab',
+      spec: { ori: [0, 1, 1], rot: [-20, 20], n: [3, 6, 1], L: [45, 75], pair: [0, 1, 1], sp: [28, 48], sh: [-15, 15], ...OFF, ...CP, ...WTS(12) },
+      build(p) {
+        const R = (p.ori ? 90 : 0) + p.rot, out = [];
+        for (let k = 0; k < p.n; k++) {
+          const v = (k - (p.n - 1) / 2) * p.sp;
+          if (p.pair) {
+            const l = p.L * 0.7;
+            for (const sg of [-1, 1]) out.push(res(...local(100 + p.ox, 100 + p.oy, R, p.sh + sg * (l / 2 + 10), v), l, D, R));
+          } else out.push(res(...local(100 + p.ox, 100 + p.oy, R, p.sh, v), p.L, D, R));
+        }
+        return out;
+      } },
+    { id: 'stagger',
+      spec: { ori: [0, 1, 1], rot: [-20, 20], n: [3, 6, 1], L: [45, 75], sp: [26, 44], st: [12, 35], ...OFF, ...CP, ...WTS(6) },
+      build(p) {
+        const R = (p.ori ? 90 : 0) + p.rot, out = [];
+        for (let k = 0; k < p.n; k++)
+          out.push(res(...local(100 + p.ox, 100 + p.oy, R, (k % 2 ? 1 : -1) * p.st, (k - (p.n - 1) / 2) * p.sp), p.L, D, R));
+        return out;
+      } },
+    { id: 'tower',
+      spec: { rot: [-45, 45], rows: [2, 4, 1], cols: [2, 4, 1], sx: [38, 62], sy: [38, 62], stag: [0, 1], sz: [22, 28], ...OFF, ...CP, ...WTS(16) },
+      build(p) {
+        const out = [];
+        for (let r = 0; r < p.rows; r++)
+          for (let c = 0; c < p.cols; c++) {
+            const u = (c - (p.cols - 1) / 2) * p.sx + ((r % 2) - 0.5) * p.stag * p.sx / 2;
+            out.push(res(...local(100 + p.ox, 100 + p.oy, p.rot, u, (r - (p.rows - 1) / 2) * p.sy), p.sz, p.sz, p.rot));
+          }
+        return out;
+      } },
+    { id: 'court',
+      spec: { Lb: [60, 100], La: [40, 75], R: [0, 3, 1], jr: [-15, 15], ux: [70, 130], uy: [70, 130], t: [0, 4, 1], trot: [-45, 45], ...XY(4), ...CP, ...WTS(7) },
+      build(p) {
+        const R = p.R * 90 + p.jr, v0 = -p.La / 2;
+        const out = [res(...local(p.ux, p.uy, R, 0, v0), p.Lb, D, R, 'U1')];
+        for (const sg of [-1, 1]) out.push(res(...local(p.ux, p.uy, R, sg * (p.Lb / 2 - D / 2), v0 + D / 2 + p.La / 2), D, p.La, R, 'U1'));
+        for (let i = 0; i < p.t; i++) out.push(res(p['t' + i + 'x'], p['t' + i + 'y'], TW, TW, p.trot));
+        return out;
+      } },
+    { id: 'perimeter',
+      spec: { nL: [45, 85], sL: [45, 85], eL: [45, 85], wL: [45, 85], nO: [-40, 40], sO: [-40, 40], eO: [-40, 40], wO: [-40, 40], inset: [0, 15], t: [0, 2, 1], ...XY(2, 60, 140), ...CP, ...WTS(6) },
+      build(p) {
+        const e = RULES.setback + D / 2 + p.inset, m = SITE.W / 2;
+        const out = [
+          res(m + p.nO, SITE.H - e, p.nL, D, 0), res(m + p.sO, e, p.sL, D, 0),
+          res(SITE.W - e, m + p.eO, D, p.eL, 0), res(e, m + p.wO, D, p.wL, 0)
+        ];
+        for (let i = 0; i < p.t; i++) out.push(res(p['t' + i + 'x'], p['t' + i + 'y'], TW, TW, 0));
+        return out;
+      } },
+    { id: 'hybrid',             // a band of slabs on one side, a row of towers on the other
+      spec: { R: [0, 3, 1], jr: [-15, 15], ns: [2, 3, 1], L: [50, 75], sp: [30, 42], su: [-20, 20], nt: [3, 5, 1], tsx: [40, 55], tv: [30, 60], ...OFF, ...CP, ...WTS(8) },
+      build(p) {
+        const R = p.R * 90 + p.jr, cx = 100 + p.ox, cy = 100 + p.oy, out = [];
+        for (let k = 0; k < p.ns; k++) out.push(res(...local(cx, cy, R, p.su, -20 - k * p.sp), p.L, D, R));
+        for (let i = 0; i < p.nt; i++) out.push(res(...local(cx, cy, R, (i - (p.nt - 1) / 2) * p.tsx, p.tv), TW, TW, R));
+        return out;
+      } }
+  ];
+
+  // ---------- search ----------
+  function sampleParams(spec, rnd) {
+    const p = {};
+    for (const [k, [lo, hi, int]] of Object.entries(spec)) p[k] = int ? Math.min(hi, lo + Math.floor(rnd() * (hi - lo + 1))) : lo + rnd() * (hi - lo);
+    return p;
+  }
+  function mutate(spec, p, rnd) {
+    const q = { ...p }, keys = Object.keys(spec), m = 1 + Math.floor(rnd() * 3);
+    for (let i = 0; i < m; i++) {
+      const k = keys[Math.floor(rnd() * keys.length)], [lo, hi, int] = spec[k];
+      q[k] = int ? clamp(q[k] + (rnd() < 0.5 ? -1 : 1), lo, hi) : clamp(q[k] + gauss(rnd) * 0.15 * (hi - lo), lo, hi);
+    }
+    return q;
+  }
+  function candidate(type, p, brief) {
+    const bs = type.build(p);
+    bs.forEach((b, i) => { b.wt = p['w' + i] ?? 1; });
+    bs.push(carpark(p));
+    if (!setbackOK(bs) || !treesOK(bs) || separation(bs, true)) return null;
+    if (!assignStoreys(bs, brief)) return null;
+    if (coverOf(bs) > brief.maxCoverage) return null;
+    if (SITE_AREA * (1 - coverOf(bs)) < brief.greenRatio * SITE_AREA + PROGRAM_AREA) return null;
+    return bs;
+  }
+  function searchType(type, brief, rnd) {
+    const pool = [];
+    let tries = 0;
+    while (tries < SEARCH.maxTries && pool.length < SEARCH.pool) {
+      tries++;
+      const p = sampleParams(type.spec, rnd), bs = candidate(type, p, brief);
+      if (bs) pool.push({ p, bs, J: evaluate(bs, SEARCH.coarseGrid).J });
+    }
+    pool.sort((a, b) => b.J - a.J);
+    const top = pool.slice(0, SEARCH.top);
+    for (const c of top)                                         // local refinement (hill climbing)
+      for (let i = 0; i < SEARCH.mutations; i++) {
+        tries++;
+        const q = mutate(type.spec, c.p, rnd), bs = candidate(type, q, brief);
+        if (!bs) continue;
+        const J = evaluate(bs, SEARCH.coarseGrid).J;
+        if (J > c.J) Object.assign(c, { p: q, bs, J });
+      }
+    top.sort((a, b) => b.J - a.J);
+    return { best: top[0] || null, tries };
+  }
+  function baselineBuildings(brief) {   // conventional HDB-style reference: east–west slabs of equal height
+    const bs = [30, 65, 100, 135, 170].map(y => ({ ...res(100, y, 75, D, 0), wt: 1 }));
+    bs.push({ type: 'carpark', x: 172.5, y: 27.5, w: RULES.park.w, d: RULES.park.d, rot: 0 });
+    return assignStoreys(bs, brief) ? bs : null;
+  }
+  function contributions(bs, J) {
+    return bs.map((b, i) => ({ id: b.id, drop: J ? (J - evaluate(bs.filter((_, k) => k !== i), SITE.gridSize).J) / J : 0 }));
+  }
+  function refresh(o, full) {
+    o.ev = evaluate(o.buildings, SITE.gridSize);
+    o.ew = ewFacade(o.buildings);
+    o.comp = compliance(o.buildings, o.brief);
+    if (full) o.contrib = contributions(o.buildings, o.ev.J);
+  }
+  function finalize(typeId, bs, brief) {
+    let n = 0;
+    bs.forEach(b => { b.id = b.type === 'residential' ? 'B' + (++n) : 'P1'; delete b.wt; });
+    const o = { type: typeId, brief: { ...brief }, buildings: bs, orig: clone(bs), edited: false };
+    refresh(o, true);
+    o.origJ = o.ev.J;
+    return o;
+  }
+
+  // ---------- layout JSON for the landscape stage (interface.md §3) ----------
+  function toLayout(o, seed) {
+    const bs = o.buildings.map(b => {
+      const r = { id: b.id, type: b.type, x: r1(b.x), y: r1(b.y), w: r1(b.w), d: r1(b.d), rot: r1(normRot(b.rot)),
+                  storeys: b.storeys, h: r1(b.h), voidDeck: b.type === 'residential' };
+      if (b.group) r.group = b.group;
+      return r;
+    });
+    const ev = evaluate(bs, SITE.gridSize);          // score exactly what is exported
+    return {
+      version: '0.1', units: 'm',
+      site: { polygon: SITE.polygon, gridSize: SITE.gridSize, entrances: SITE.entrances, existingTrees: SITE.existingTrees },
+      brief: { siteArea: SITE_AREA, gpr: o.brief.gpr, maxCoverage: o.brief.maxCoverage, maxStoreys: o.brief.maxStoreys,
+               floorHeight: o.brief.floorHeight, greenRatio: o.brief.greenRatio },
+      program: PROGRAM, sun: SUN, buildings: bs,
+      meta: {
+        optionId: `${o.type}-${seed}`, typology: TYPE_NAME[o.type], seed, edited: o.edited,
+        score: {
+          outdoorArea_m2: Math.round(ev.outdoor), shadeArea_m2h: Math.round(ev.J),
+          shadedArea_m2: Object.fromEntries(SUN.map(s => [s.time, Math.round(ev.byTime[s.time])]))
+        }
+      }
+    };
+  }
+
+  // ---------- explanation (rule-based; numbers come only from the evaluation) ----------
+  function axisOf(bs) {
+    let cx = 0, sy = 0, tot = 0;
+    for (const b of bs) {
+      if (b.type !== 'residential' || Math.max(b.w, b.d) / Math.min(b.w, b.d) < 1.6) continue;
+      const L = Math.max(b.w, b.d), a = rad(b.w >= b.d ? b.rot : b.rot + 90) * 2;
+      cx += Math.cos(a) * L; sy += Math.sin(a) * L; tot += L;
+    }
+    if (!tot) return 'mainly point towers';
+    if (Math.hypot(cx, sy) / tot < 0.5) return 'mixed slab orientations';
+    const A = ((Math.atan2(sy, cx) / 2) * 180 / Math.PI + 180) % 180;
+    return A < 20 || A > 160 ? 'long axes mostly east–west' : A > 70 && A < 110 ? 'long axes mostly north–south' : 'blocks set at an angle';
+  }
+  function locOf(b) {
+    const c = v => v < 75 ? 0 : v > 125 ? 2 : 1;
+    return [['south-west', 'south', 'south-east'], ['west', 'centre', 'east'], ['north-west', 'north', 'north-east']][c(b.y)][c(b.x)];
+  }
+  function explain(o, base) {
+    const ev = o.ev, out = [], pct = v => Math.round(v * 100);
+    out.push(`${TYPE_NAME[o.type]}: ${o.buildings.filter(b => b.type === 'residential').length} residential blocks + 1 multi-storey car park; ${axisOf(o.buildings)}.`);
+    const top = (o.contrib || []).slice().sort((a, b) => b.drop - a.drop)[0];
+    const tb = top && o.buildings.find(b => b.id === top.id);
+    if (tb && top.drop > 0) out.push(`${tb.id} (${tb.storeys} storeys, ${locOf(tb)} of the site) contributes most shade — removing it cuts shade by ${pct(top.drop)}%.`);
+    const p = SUN.map(s => ev.byTime[s.time] / ev.outdoor);
+    out.push(`At 11:00 buildings shade ${pct(p[0])}% of the outdoor space; at 15:00, ${pct(p[2])}%.`);
+    out.push(`At 13:00 the sun is almost overhead and buildings shade only ${pct(p[1])}% — trees and covered linkways have to fill this gap in the landscape stage.`);
+    if (base) {
+      const d = ev.J / base.ev.J - 1;
+      out.push(`${Math.abs(pct(d))}% ${d >= 0 ? 'more' : 'less'} shade than the conventional east–west slab layout (equinox, 11–15 h).`);
+      const r = o.ew / base.ew;
+      if (r > 1.3) out.push(`Trade-off: east/west-facing façade area is ${r.toFixed(1)}× the conventional layout — more indoor heat gain for the architect to weigh.`);
+    }
+    return out;
+  }
+
+  root.MC = { SITE, SUN, RULES, PROGRAM, PROGRAM_AREA, DEFAULT_BRIEF, TYPES, TYPE_NAME, mulberry32, clone, local, corners, inConvex,
+              evaluate, compliance, ewFacade, searchType, baselineBuildings, refresh, finalize, toLayout, explain, gfaOf, coverOf };
+})(window);
+</script>
+
+<script>
+const DEFAULT_LAYOUT = {"version":"0.1","units":"m","site":{"polygon":[[0,0],[200,0],[200,200],[0,200]],"gridSize":2,"entrances":[{"id":"E1","x":100,"y":200,"type":"vehicle"},{"id":"E2","x":190,"y":200,"type":"bus_stop"},{"id":"E3","x":0,"y":100,"type":"pedestrian"}],"existingTrees":[{"x":180,"y":80,"r":6,"h":10},{"x":190,"y":92,"r":6,"h":10}]},"brief":{"siteArea":40000,"gpr":2.8,"maxCoverage":0.25,"maxStoreys":30,"floorHeight":2.8,"greenRatio":0.3},"program":[{"type":"playground","area":600},{"type":"fitness","area":300},{"type":"plaza","area":800},{"type":"community_garden","area":400}],"sun":[{"time":"11:00","alt":56.9,"az":92.4,"hours":2},{"time":"13:00","alt":86.6,"az":116.3,"hours":2},{"time":"15:00","alt":63,"az":267.1,"hours":2}],"buildings":[{"id":"B1","type":"residential","x":25,"y":130,"w":15,"d":60,"rot":0,"storeys":30,"h":84,"voidDeck":true},{"id":"B2","type":"residential","x":175,"y":130,"w":15,"d":60,"rot":0,"storeys":30,"h":84,"voidDeck":true},{"id":"B3","type":"residential","x":100,"y":170,"w":60,"d":15,"rot":0,"storeys":25,"h":70,"voidDeck":true},{"id":"B4","type":"residential","x":60,"y":55,"w":50,"d":15,"rot":30,"storeys":25,"h":70,"voidDeck":true},{"id":"B5","type":"residential","x":120,"y":75,"w":25,"d":25,"rot":0,"storeys":27,"h":75.6,"voidDeck":true},{"id":"P1","type":"carpark","x":170,"y":35,"w":40,"d":40,"rot":0,"storeys":7,"h":21,"voidDeck":false}],"meta":{"optionId":"sample-01","typology":"Parallel slabs","score":{"outdoorArea_m2":34296,"shadeArea_m2h":33432,"shadedArea_m2":{"11:00":8592,"13:00":1148,"15:00":6976}}}};
+
+/* ===== Landscape stage UI ===== */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const AREA_NAME = { playground: 'Playground', plaza: 'Plaza', fitness: 'Fitness', community_garden: 'Community garden' };
+  const state = { R: null, layout: null, preview: 'C', selected: null, time: null, src: 'all' };
+
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function pct(x) { return Math.round(x * 100) + '%'; }
+
+  function loadInitial() {
+    let txt = null;
+    try { txt = localStorage.getItem('cooling.layout'); } catch (e) { txt = null; }
+    if (txt) { try { return { layout: JSON.parse(txt), from: 'handoff' }; } catch (e) { /* fall through */ } }
+    return { layout: DEFAULT_LAYOUT, from: 'sample' };
+  }
+
+  function run(layout, from) {
+    state.layout = layout; state.selected = null;
+    const R = LS.runAll(layout); state.R = R;
+    if (state.time == null || state.time >= R.P.sun.length) state.time = R.P.t13;
+    // source chip
+    const id = (layout.meta && layout.meta.optionId) || 'Unnamed layout';
+    const typ = (layout.meta && layout.meta.typology) ? ' (' + layout.meta.typology + ')' : '';
+    $('src').lastElementChild.textContent = (from === 'handoff' ? 'From massing: ' : from === 'file' ? 'Loaded: ' : 'Sample: ') + id + typ;
+    // reconcile against architecture-side score when present
+    const ref = layout.meta && layout.meta.score;
+    const chip = $('rec');
+    if (ref && ref.shadeArea_m2h) {
+      const dJ = (R.rec.J - ref.shadeArea_m2h) / ref.shadeArea_m2h;
+      const per = ref.shadedArea_m2 || {};
+      const devs = R.P.sun.map((s, t) => per[s.time] ? Math.abs(R.rec.perTime[t] - per[s.time]) / per[s.time] : 0);
+      const ok = Math.abs(dJ) <= 0.03 && devs.every(d => d <= 0.03);
+      chip.className = 'chip ' + (ok ? 'ok' : 'bad');
+      chip.lastElementChild.textContent = (ok ? 'Reconciled ' : 'Reconcile gap ') + (dJ >= 0 ? '+' : '') + (dJ * 100).toFixed(1) + '%';
+      chip.title = 'Building-shade J: landscape ' + fmt(R.rec.J) + ' / massing ' + fmt(ref.shadeArea_m2h) + ' m²·h';
+    } else { chip.className = 'chip'; chip.lastElementChild.textContent = 'No reference'; chip.title = ''; }
+    console.log('[reconcile] building shade', R.P.sun.map((s, t) => s.time + ' ' + R.rec.perTime[t] + ' m²').join(' · '), '· J', R.rec.J, '· outdoor', R.rec.outdoorArea, '·', R.ms, 'ms');
+    buildTimeSeg(); renderCards(); drawPlan(); reset3D(); show3D();
+  }
+
+  // ---------- cards ----------
+  const METRICS = [
+    { key: 'shade1300_m2', label: 'Shaded at 13:00', unit: 'm²', up: true, f: v => fmt(v) },
+    { key: 'seatShadeRatio', label: 'Seat shade ratio', unit: '', up: true, f: v => pct(v) },
+    { key: 'maxExposedRun_m', label: 'Longest exposed path', unit: 'm', up: false, f: v => fmt(v) },
+    { key: 'shadeArea_m2h', label: 'Shade J', unit: 'm²·h', up: true, f: v => fmt(v) }
+  ];
+  function deltaText(m, v, b) {
+    const d = v - b;
+    if (Math.abs(d) < 1e-9) return { t: '±0', c: 'flat' };
+    const good = m.up ? d > 0 : d < 0;
+    const t = m.key === 'seatShadeRatio' ? (d > 0 ? '+' : '−') + Math.abs(Math.round(d * 100)) + ' pt' : (d > 0 ? '+' : '−') + fmt(Math.abs(d));
+    return { t, c: good ? 'good' : 'bad' };
+  }
+  function renderCards() {
+    const R = state.R, b = R.baseline.score;
+    $('baseline').innerHTML = '<div class="metrics">' + METRICS.map(m =>
+      '<span class="k">' + m.label + '</span><span class="v">' + m.f(b[m.key]) + (m.unit ? ' ' + m.unit : '') + '</span><span class="d flat">baseline</span>').join('') + '</div>';
+    const best = {};
+    METRICS.forEach(m => { const vals = R.options.map(o => o.score[m.key]); best[m.key] = m.up ? Math.max(...vals) : Math.min(...vals); });
+    $('options').innerHTML = R.options.map(o => {
+      const rows = METRICS.map(m => { const v = o.score[m.key], d = deltaText(m, v, b[m.key]);
+        const isBest = v === best[m.key] && R.options.filter(x => x.score[m.key] === v).length < R.options.length;
+        return '<span class="k">' + m.label + (isBest ? '<span class="best">best</span>' : '') + '</span><span class="v">' + m.f(v) + (m.unit ? ' ' + m.unit : '') + '</span><span class="d ' + d.c + '">' + d.t + '</span>'; }).join('');
+      const short = o.newTrees.length < LS.TREE_BUDGET ? '<span class="note">Only ' + o.newTrees.length + ' trees placed (not enough valid spots)</span>' : '';
+      const sel = state.selected === o.id;
+      return '<div class="card option' + (state.preview === o.id ? ' preview' : '') + (sel ? ' selected' : '') + '" data-id="' + o.id + '" role="button" tabindex="0" aria-pressed="' + (state.preview === o.id) + '">' +
+        '<div class="head"><span class="name"><span class="tag">' + o.id + '</span>' + o.name + '</span></div>' +
+        '<p class="idea">' + o.idea + '</p>' + short +
+        '<div class="metrics">' + rows + '</div>' +
+        '<div class="actions"><span class="readout">' + o.newTrees.length + ' new trees · ' + o.seats.length + ' seats</span>' +
+        (sel ? '<span class="selbadge">Selected</span>' : '<button type="button" class="btn primary" data-select="' + o.id + '">Select this scheme</button>') + '</div></div>';
+    }).join('');
+    $('options').querySelectorAll('.option').forEach(el => {
+      el.addEventListener('click', e => {
+        const s = e.target.closest('[data-select]');
+        if (s) { select(s.dataset.select); return; }
+        state.preview = el.dataset.id; renderCards(); drawPlan(); show3D();
+      });
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } });
+    });
+  }
+
+  // ---------- plan ----------
+  function buildTimeSeg() {
+    const P = state.R.P, seg = $('timeSeg');
+    seg.innerHTML = P.sun.map((s, t) => '<button type="button" data-t="' + t + '" aria-pressed="' + (state.time === t) + '">' + s.time + '</button>').join('') +
+      '<button type="button" data-t="avg" aria-pressed="' + (state.time === 'avg') + '">Average</button>';
+    seg.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+      state.time = btn.dataset.t === 'avg' ? 'avg' : +btn.dataset.t; buildTimeSeg(); drawPlan(); }));
+  }
+  ['srcBldg', 'srcAll'].forEach(id => $(id).addEventListener('click', () => {
+    state.src = id === 'srcAll' ? 'all' : 'bldg';
+    $('srcBldg').setAttribute('aria-pressed', state.src === 'bldg'); $('srcAll').setAttribute('aria-pressed', state.src === 'all'); drawPlan(); }));
+  ['lyShade', 'lyAreas', 'lyPaths', 'lyTrees', 'lySeats'].forEach(id => $(id).addEventListener('change', drawPlan));
+
+  let view = null; // {k, seats:[{px,py,seat}]}
+  function currentOption() { return state.R.options.find(o => o.id === state.preview); }
+  function shadeValue(S, k) {
+    const P = state.R.P;
+    if (state.time === 'avg') { let v = 0; P.sun.forEach((s, t) => { v += S[t][k] * s.hours; }); return v / P.hoursTotal; }
+    return S[state.time][k];
+  }
+  function drawPlan() {
+    const R = state.R; if (!R || $('stage2').hidden) return;
+    const P = R.P, G = P.G, opt = currentOption();
+    const cv = $('plan'), box = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    const size = Math.max(280, Math.round(box.width));
+    cv.width = size * dpr; cv.height = size * dpr;
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const k = size / Math.max(G.W, G.H);
+    const X = x => x * k, Y = y => size - y * k;
+    view = { k, size, seats: [] };
+    const col = n => css(n);
+    ctx.fillStyle = col('--ground'); ctx.fillRect(0, 0, size, size);
+
+    const S = state.src === 'all' ? opt.S : R.baseline.S;
+    const showTrees = state.src === 'all';
+    // activity areas (under shade)
+    if ($('lyAreas').checked) P.areas.forEach(a => {
+      ctx.fillStyle = col('--a-' + a.type); ctx.globalAlpha = 0.35;
+      ctx.fillRect(X(a.x0), Y(a.y0 + a.d), a.w * k, a.d * k); ctx.globalAlpha = 1;
+      ctx.strokeStyle = col('--a-' + a.type); ctx.lineWidth = 1.5; ctx.strokeRect(X(a.x0), Y(a.y0 + a.d), a.w * k, a.d * k);
+    });
+    // shade
+    if ($('lyShade').checked) {
+      ctx.fillStyle = col('--shade');
+      for (let c = 0; c < G.n; c++) {
+        if (!P.outdoor[c]) continue;
+        const v = shadeValue(S, c); if (v <= 0.01) continue;
+        ctx.globalAlpha = v * 0.5;
+        ctx.fillRect(X(G.cx(c % G.nx) - G.g / 2), Y(G.cy(Math.floor(c / G.nx)) + G.g / 2), G.g * k + 0.5, G.g * k + 0.5);
+      }
+      ctx.globalAlpha = 1;
+    }
+    // paths
+    if ($('lyPaths').checked) {
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      const drawPoly = (pl, w, c) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); pl.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1]))); ctx.stroke(); };
+      P.paths.forEach(p => drawPoly(p.polyline, 2.4 * k + 1.5, col('--path-edge')));
+      P.paths.forEach(p => drawPoly(p.polyline, 2.4 * k, col('--path')));
+      // exposed path cells (hour-weighted mean shade < 0.5), using the shade source shown
+      ctx.fillStyle = col('--heat');
+      const seen = new Set();
+      P.paths.forEach(p => p.cells.forEach(c => {
+        if (seen.has(c) || P.inBuilding[c]) return; seen.add(c);
+        let v = 0; P.sun.forEach((s, t) => { v += S[t][c] * s.hours; }); v /= P.hoursTotal;
+        if (v < 0.5) { const x = G.cx(c % G.nx), y = G.cy(Math.floor(c / G.nx)); ctx.globalAlpha = 0.85; ctx.beginPath(); ctx.arc(X(x), Y(y), Math.max(1.6, 0.55 * k), 0, Math.PI * 2); ctx.fill(); }
+      }));
+      ctx.globalAlpha = 1;
+    }
+    // buildings
+    P.layout.buildings.forEach((b, i) => {
+      const f = P.fps[i];
+      ctx.beginPath(); f.forEach((p, j) => j ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1]))); ctx.closePath();
+      ctx.fillStyle = col('--bldg'); ctx.fill();
+      if (b.voidDeck) { // hatch to mark void deck
+        ctx.save(); ctx.clip(); ctx.strokeStyle = col('--ground'); ctx.globalAlpha = 0.35; ctx.lineWidth = 1;
+        for (let s = -size; s < size * 2; s += 7) { ctx.beginPath(); ctx.moveTo(s, 0); ctx.lineTo(s - size, size); ctx.stroke(); }
+        ctx.restore(); ctx.globalAlpha = 1;
+      }
+      ctx.fillStyle = col('--surface'); ctx.font = '600 ' + Math.max(10, 3.6 * k) + 'px ' + col('--f-mono');
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(b.id, X(b.x), Y(b.y));
+    });
+    // area labels
+    if ($('lyAreas').checked) P.areas.forEach(a => {
+      ctx.fillStyle = col('--ink'); ctx.font = '600 ' + Math.max(10, 3.4 * k) + 'px ' + col('--f-body');
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(AREA_NAME[a.type] || a.type, X(a.x0 + a.w / 2), Y(a.y0 + a.d / 2));
+    });
+    // trees
+    if ($('lyTrees').checked) {
+      const trees = showTrees ? opt.trees : (P.layout.site.existingTrees || []).map(t => ({ ...t, existing: true }));
+      trees.forEach(t => {
+        ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), t.r * k, 0, Math.PI * 2);
+        ctx.fillStyle = col('--canopy'); ctx.globalAlpha = t.existing ? 0.45 : 0.22; ctx.fill(); ctx.globalAlpha = 1;
+        ctx.strokeStyle = col('--canopy'); ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), Math.max(1.5, 0.5 * k), 0, Math.PI * 2); ctx.fillStyle = col('--canopy'); ctx.fill();
+      });
+    }
+    // seats
+    if ($('lySeats').checked) {
+      const seats = showTrees ? opt.seats : R.baseline.seats;
+      const s = Math.max(4, 1.8 * k);
+      seats.forEach(st => {
+        const v = state.time === 'avg' ? st.perTime.reduce((a, x, t) => a + (x >= LS.SHADED ? P.sun[t].hours : 0), 0) / P.hoursTotal : (st.perTime[state.time] >= LS.SHADED ? 1 : 0);
+        const ok = state.time === 'avg' ? v >= 0.66 : v === 1;
+        const px = X(st.x), py = Y(st.y);
+        ctx.fillStyle = ok ? col('--canopy') : col('--heat'); ctx.strokeStyle = col('--surface'); ctx.lineWidth = 1.5;
+        ctx.fillRect(px - s / 2, py - s / 2, s, s); ctx.strokeRect(px - s / 2, py - s / 2, s, s);
+        view.seats.push({ px, py, st });
+      });
+    }
+    // entrances
+    (P.layout.site.entrances || []).forEach(e => {
+      const px = Math.min(size - 14, Math.max(14, X(e.x))), py = Math.min(size - 14, Math.max(14, Y(e.y)));
+      ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fillStyle = e.type === 'vehicle' ? col('--muted') : col('--ink'); ctx.fill();
+      ctx.fillStyle = col('--surface'); ctx.font = '600 10px ' + col('--f-mono'); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e.id, px, py + 0.5);
+    });
+    // scale bar
+    ctx.fillStyle = col('--ink'); ctx.fillRect(12, size - 16, 20 * k, 3);
+    ctx.font = '500 11px ' + col('--f-mono'); ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText('20 m', 12, size - 20);
+    ctx.textAlign = 'right'; ctx.fillText('N ↑', size - 12, size - 14);
+
+    // legend + readout
+    const tlabel = state.time === 'avg' ? 'average of 3 moments' : P.sun[state.time].time + ' (altitude ' + P.sun[state.time].alt + '°, azimuth ' + P.sun[state.time].az + '°)';
+    $('legend').innerHTML = [
+      ['--shade', 'Shade (darker = cooler)'], ['--heat', 'Exposed path / hot seat'], ['--canopy', 'Canopy / shaded seat'], ['--bldg', 'Building (hatched = void deck)']
+    ].concat(P.areas.map(a => ['--a-' + a.type, AREA_NAME[a.type] + ' ' + fmt(a.area) + ' m²']))
+      .map(([c, t]) => '<span><i class="sw" style="background:var(' + c + ')"></i>' + t + '</span>').join('');
+    const sc = (state.src === 'all' ? opt : R.baseline).score;
+    $('readout').textContent = (state.src === 'all' ? 'Scheme ' + opt.id + ' ' + opt.name : 'Buildings + retained trees only') + ' · ' + tlabel +
+      ' · shaded at 13:00 ' + fmt(sc.shade1300_m2) + ' m² · seat shade ' + pct(sc.seatShadeRatio) + ' · longest exposed path ' + sc.maxExposedRun_m + ' m';
+  }
+  // seat tooltip
+  $('plan').addEventListener('mousemove', e => {
+    if (!view) return;
+    const r = $('plan').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    const hit = view.seats.find(s => Math.abs(s.px - x) < 7 && Math.abs(s.py - y) < 7);
+    const tip = $('tip');
+    if (!hit) { tip.hidden = true; return; }
+    const P = state.R.P;
+    tip.textContent = 'Seat · ' + P.sun.map((s, t) => s.time + ' ' + Math.round(hit.st.perTime[t] * 100) + '%').join(' / ');
+    tip.style.left = hit.px + 'px'; tip.style.top = hit.py + 'px'; tip.hidden = false;
+  });
+  $('plan').addEventListener('mouseleave', () => { $('tip').hidden = true; });
+
+  // ---------- selection / 3D / export ----------
+  function finalLayout() {
+    const opt = state.R.options.find(o => o.id === state.selected);
+    return Object.assign({}, state.layout, { landscape: LS.landscapeJSON(state.R, opt) });
+  }
+  function select(id) {
+    state.selected = id; state.preview = id; renderCards(); drawPlan();
+    ['copyJson', 'dlJson', 'handoff'].forEach(b => { $(b).disabled = false; });
+    show3D();
+  }
+  function reset3D() {
+    ['copyJson', 'dlJson', 'handoff'].forEach(b => { $(b).disabled = true; });
+    $('toast').textContent = '';
+  }
+  function show3D() {
+    if (!state.R) return;
+    const o = state.R.options.find(x => x.id === state.preview);
+    $('title3d').textContent = '3D model · Scheme ' + o.id + ' ' + o.name + (state.selected === o.id ? ' (selected)' : ' (preview)');
+    if (!window.LS3D) {
+      $('empty3d').hidden = false;
+      $('empty3d').textContent = window.LS3D_FAILED ? 'The 3D library did not load (needs access to cdnjs.cloudflare.com and cdn.jsdelivr.net). The plan and scores are unaffected.' : 'Loading 3D…';
+      return;
+    }
+    $('empty3d').hidden = true;
+    window.LS3D.build($('view3d'), state.R, o);
+    setHour(+$('hour').value);
+  }
+  function setHour(h) {
+    const P = state.R.P;
+    const hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+    const label = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+    const exact = P.sun.find(s => s.time === label);
+    const sun = exact ? { alt: exact.alt, az: exact.az } : LS.sunPosition('2026-03-20', h);
+    $('hourOut').textContent = label;
+    $('sunOut').textContent = 'Sun altitude ' + sun.alt.toFixed(1) + '° · azimuth ' + sun.az.toFixed(1) + '°' + (exact ? ' · same as scoring' : ' · formula estimate');
+    if (window.LS3D) window.LS3D.setSun(sun);
+  }
+  $('hour').addEventListener('input', e => setHour(+e.target.value));
+  window.addEventListener('ls3d-ready', () => show3D());
+
+  function flash(msg) { $('toast').textContent = msg; clearTimeout(flash.t); flash.t = setTimeout(() => { $('toast').textContent = ''; }, 3500); }
+  $('copyJson').addEventListener('click', () => {
+    const txt = JSON.stringify(finalLayout(), null, 2);
+    const fallback = () => { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); flash('Copied'); } catch (e) { flash('Copy failed — use Download instead'); } ta.remove(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => flash('JSON copied'), fallback); else fallback();
+  });
+  $('dlJson').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(finalLayout(), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = ((state.layout.meta && state.layout.meta.optionId) || 'layout') + '-landscape-' + state.selected + '.json';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    flash('Download started (preview environments may block it — use Copy instead)');
+  });
+  $('handoff').addEventListener('click', () => {
+    try { localStorage.setItem('cooling.final', JSON.stringify(finalLayout())); flash('Scheme ' + state.selected + ' confirmed and saved'); }
+    catch (e) { flash('The browser blocked saving — use Copy or Download'); }
+  });
+  $('file').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => { try { const L = JSON.parse(rd.result); if (!L.buildings || !L.sun || !L.site) throw new Error('missing site / sun / buildings'); run(L, 'file'); }
+      catch (err) { $('src').className = 'chip bad'; $('src').lastElementChild.textContent = 'Load failed: ' + err.message; } };
+    rd.readAsText(f); e.target.value = '';
+  });
+
+  // redraw on resize / theme change
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawPlan, 120); });
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawPlan(); show3D(); }); } catch (e) {}
+  new MutationObserver(() => { drawPlan(); show3D(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // started by the stage switcher (from the massing hand-off, localStorage or the sample)
+  window.LSUI = {
+    run,
+    start() { const init = loadInitial(); run(init.layout, init.from); },
+    ready: () => !!state.R,
+    redraw: drawPlan
+  };
+})();
+</script>
+
+<script>
+/* ===== Massing stage UI ===== */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmt = n => Math.round(n).toLocaleString('en-US');
+  const signed = d => (d >= 0 ? '+' : '−') + Math.abs(Math.round(d * 100)) + '%';
+  const st = { brief: { ...MC.DEFAULT_BRIEF }, seed: 7, options: [], baseline: null, sel: -1, selB: -1, mode: 'all',
+               drag: null, busy: false, live: 0, confirmed: -1 };
+
+  // ---------- planning brief ----------
+  const EDIT = {
+    gpr:         { label: 'Plot ratio (GPR)',  min: 1.5, max: 4.2, step: 0.1, toIn: v => v,                   fromIn: v => v,       unit: '' },
+    maxCoverage: { label: 'Max site coverage', min: 10,  max: 40,  step: 1,   toIn: v => Math.round(v * 100), fromIn: v => v / 100, unit: '%' },
+    maxStoreys:  { label: 'Height limit',      min: 12,  max: 40,  step: 1,   toIn: v => v,                   fromIn: v => v,       unit: 'st' },
+    floorHeight: { label: 'Floor-to-floor',    min: 2.6, max: 3.6, step: 0.1, toIn: v => v,                   fromIn: v => v,       unit: 'm' }
+  };
+  function renderBrief() {
+    const R = MC.RULES, ro = (k, v) => `<div class="brow"><span>${k}</span><span class="v">${v}</span></div>`;
+    const ed = k => { const e = EDIT[k];
+      return `<div class="brow key"><label for="in-${k}">${e.label}</label><span><input id="in-${k}" type="number" min="${e.min}" max="${e.max}" step="${e.step}" value="${e.toIn(st.brief[k])}"><span class="u">${e.unit}</span></span></div>`; };
+    $('mBrief').innerHTML = [
+      ['Site', ro('Site area', '4.0 ha · 200 × 200 m') + ro('Land use', 'Residential (HDB)') + ro('Entrances / bus stop', MC.SITE.entrances.length) + ro('Retained trees', MC.SITE.existingTrees.length)],
+      ['Intensity', ed('gpr') + ed('maxCoverage') + ed('maxStoreys') + ed('floorHeight')],
+      ['Form control', ro('Setback', R.setback + ' m') + ro('Block separation', R.sepRes + ' m') + ro('Slab depth', R.slabDepth + ' m') + ro('Point block', `${R.tower} × ${R.tower} m`)],
+      ['Greenery & amenities', ro('Green ratio', Math.round(R.greenRatio * 100) + '%') + ro('Car park (MSCP)', '7 st · 40×40 m') + ro('Outdoor amenities', fmt(MC.PROGRAM_AREA) + ' m²')],
+      ['Climate & analysis', ro('Latitude', '1.35°N') + ro('Design day', 'Equinox 11·13·15 h') + ro('Grid', MC.SITE.gridSize + ' m')]
+    ].map(([g, rows]) => `<div class="bgrp"><h3>${g}</h3>${rows}</div>`).join('');
+    for (const k of Object.keys(EDIT)) $('in-' + k).addEventListener('change', ev => {
+      const e = EDIT[k], v = Math.min(e.max, Math.max(e.min, parseFloat(ev.target.value) || e.toIn(MC.DEFAULT_BRIEF[k])));
+      ev.target.value = v;
+      st.brief[k] = e.fromIn(v);
+    });
+  }
+
+  // ---------- generation ----------
+  async function generate() {
+    if (st.busy) return;
+    st.busy = true; $('mGen').disabled = true; $('mShuffle').hidden = true;
+    const t0 = performance.now(), brief = { ...st.brief }, rnd = MC.mulberry32(st.seed);
+    const bb = MC.baselineBuildings(brief);
+    st.baseline = bb ? MC.finalize('baseline', bb, brief) : null;
+    const opts = [];
+    let tries = 0;
+    for (let i = 0; i < MC.TYPES.length; i++) {
+      $('mProg').textContent = `Searching ${MC.TYPE_NAME[MC.TYPES[i].id]} (${i + 1}/6)…`;
+      await new Promise(r => setTimeout(r, 20));
+      const r = MC.searchType(MC.TYPES[i], brief, rnd);
+      tries += r.tries;
+      opts.push(r.best ? MC.finalize(MC.TYPES[i].id, r.best.bs, brief) : { type: MC.TYPES[i].id, infeasible: true });
+    }
+    opts.sort((a, b) => (b.ev ? b.ev.J : -1) - (a.ev ? a.ev.J : -1));
+    Object.assign(st, { options: opts, sel: opts[0] && !opts[0].infeasible ? 0 : -1, selB: -1, busy: false, confirmed: -1 });
+    $('mProg').textContent = `${tries.toLocaleString('en-US')} layouts evaluated in ${((performance.now() - t0) / 1000).toFixed(1)} s · seed ${st.seed}`;
+    $('mGen').disabled = false; $('mShuffle').hidden = false;
+    renderRail(); renderPanel();
+  }
+
+  // ---------- rail ----------
+  const row = (k, v, d, c) => `<span class="k">${k}</span><span class="v">${v}</span><span class="d ${c}">${d}</span>`;
+  function metricRows(o, bestJ) {
+    const b = st.baseline, p = MC.SUN.map(s => Math.round(o.ev.byTime[s.time] / o.ev.outdoor * 100));
+    const isBase = o === b, dJ = b && !isBase ? o.ev.J / b.ev.J - 1 : null, rEW = b && !isBase ? o.ew / b.ew : null;
+    return row('Shade J' + (bestJ != null && o.ev.J === bestJ ? '<span class="best">best</span>' : ''), fmt(o.ev.J) + ' m²·h',
+               dJ == null ? 'baseline' : signed(dJ), dJ == null ? 'flat' : dJ >= 0 ? 'good' : 'bad')
+      + row('Shaded 11·13·15', p.join('·') + '%', '', 'flat')
+      + row('E/W façade', fmt(o.ew) + ' m²', rEW == null ? 'baseline' : '×' + rEW.toFixed(1), rEW != null && rEW > 1.3 ? 'bad' : 'flat');
+  }
+  function renderRail() {
+    $('mBaseline').innerHTML = st.baseline
+      ? `<p class="idea">Five equal-height slabs facing north–south — common HDB practice, and the reference for every delta below.</p><div class="metrics">${metricRows(st.baseline, null)}</div>`
+      : '<p class="idea">Generate options to compute the conventional baseline under this brief.</p>';
+    if (!st.options.length) { $('mOptions').innerHTML = '<div class="card"><p class="idea">Set the brief, then press <b>Generate 6 options</b>.</p></div>'; return; }
+    const feasible = st.options.filter(o => !o.infeasible), bestJ = Math.max(...feasible.map(o => o.ev.J));
+    $('mOptions').innerHTML = st.options.map((o, i) => {
+      if (o.infeasible) return `<div class="card"><div class="head"><span class="name"><span class="tag">–</span>${MC.TYPE_NAME[o.type]}</span></div><span class="note">No feasible layout under this brief.</span></div>`;
+      const res = o.buildings.filter(b => b.type === 'residential');
+      return `<div class="card option mopt${i === st.sel ? ' preview' : ''}${i === st.confirmed ? ' selected' : ''}" data-i="${i}" role="button" tabindex="0" aria-pressed="${i === st.sel}">
+        <canvas class="thumb" aria-hidden="true"></canvas>
+        <div class="body">
+          <div class="head"><span class="name"><span class="tag">${i + 1}</span>${MC.TYPE_NAME[o.type]}</span>${i === st.confirmed ? '<span class="selbadge">Confirmed</span>' : ''}</div>
+          ${o.edited ? `<span class="note">Edited · ${signed(o.ev.J / o.origJ - 1)} shade vs the AI option</span>` : ''}
+          <div class="metrics">${metricRows(o, bestJ)}</div>
+          <span class="readout">${res.length} blocks · tallest ${Math.max(...res.map(b => b.storeys))} storeys</span>
+        </div></div>`;
+    }).join('');
+    $('mOptions').querySelectorAll('.option').forEach(el => {
+      const i = +el.dataset.i;
+      el.addEventListener('click', () => select(i));
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(i); } });
+      draw(el.querySelector('canvas'), st.options[i], 'all', {});
+    });
+  }
+  function select(i) { st.sel = i; st.selB = -1; renderRail(); renderPanel(); }
+
+  // ---------- plan drawing ----------
+  function draw(cv, o, mode, opt) {
+    const size = Math.round(cv.getBoundingClientRect().width);
+    if (!size) return;
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = size * dpr; cv.height = size * dpr;
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const k = size / MC.SITE.W, X = x => x * k, Y = y => size - y * k;
+    ctx.fillStyle = css('--ground'); ctx.fillRect(0, 0, size, size);
+
+    // outdoor cells: warm where no moment is shaded, deepening blue with each shaded moment
+    const ev = o.ev, nx = ev.nx, ny = ev.ny, cell = ev.g * k, mi = mode === 'all' ? -1 : +mode;
+    const levels = mi < 0 ? [[0, '--heat-soft', 1], [1, '--shade', 0.17], [2, '--shade', 0.33], [3, '--shade', 0.5]]
+                          : [[0, '--heat-soft', 1], [1, '--shade', 0.5]];
+    for (const [lv, color, alpha] of levels) {
+      ctx.beginPath();
+      for (let j = 0; j < ny; j++)
+        for (let i = 0; i < nx; i++) {
+          const q = j * nx + i;
+          if (ev.foot[q]) continue;
+          if ((mi < 0 ? ev.cnt[q] : ev.masks[mi][q]) === lv) ctx.rect(i * cell, (ny - 1 - j) * cell, cell + 0.5, cell + 0.5);
+        }
+      ctx.globalAlpha = alpha; ctx.fillStyle = css(color); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    const sb = MC.RULES.setback * k;
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = css('--muted'); ctx.lineWidth = 1;
+    ctx.strokeRect(sb, sb, size - 2 * sb, size - 2 * sb); ctx.setLineDash([]);
+
+    for (const t of MC.SITE.existingTrees) {
+      ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), t.r * k, 0, Math.PI * 2);
+      ctx.fillStyle = css('--canopy'); ctx.globalAlpha = 0.45; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = css('--canopy'); ctx.lineWidth = 1.2; ctx.stroke();
+    }
+
+    const selGroup = opt.sel >= 0 ? o.buildings[opt.sel].group : null, bad = new Set(opt.bad || []);
+    o.buildings.forEach((b, i) => {
+      const f = MC.corners(b);
+      ctx.beginPath(); f.forEach(([x, y], j) => j ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y))); ctx.closePath();
+      ctx.fillStyle = css('--bldg'); ctx.fill();
+      if (b.type === 'residential' && opt.labels) { // hatch to mark void deck
+        ctx.save(); ctx.clip(); ctx.strokeStyle = css('--ground'); ctx.globalAlpha = 0.35; ctx.lineWidth = 1;
+        for (let s = -size; s < size * 2; s += 7) { ctx.beginPath(); ctx.moveTo(s, 0); ctx.lineTo(s - size, size); ctx.stroke(); }
+        ctx.restore(); ctx.globalAlpha = 1;
+      }
+      if (bad.has(b.id)) { ctx.lineWidth = 2.5; ctx.strokeStyle = css('--heat'); ctx.stroke(); }
+      if (i === opt.sel || (selGroup && b.group === selGroup)) { ctx.lineWidth = 3; ctx.strokeStyle = css('--canopy'); ctx.stroke(); }
+    });
+    if (!opt.labels) return;
+
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = css('--surface');
+    const fs = Math.max(10, 3.6 * k);
+    o.buildings.forEach(b => {
+      if (Math.min(b.w, b.d) * k < 24) return;
+      ctx.font = '600 ' + fs + 'px ' + css('--f-mono'); ctx.fillText(b.id, X(b.x), Y(b.y) - fs * 0.6);
+      ctx.font = '500 ' + (fs - 1) + 'px ' + css('--f-mono'); ctx.fillText(b.storeys + 'F', X(b.x), Y(b.y) + fs * 0.6);
+    });
+    MC.SITE.entrances.forEach(e => {
+      const px = Math.min(size - 14, Math.max(14, X(e.x))), py = Math.min(size - 14, Math.max(14, Y(e.y)));
+      ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fillStyle = e.type === 'vehicle' ? css('--muted') : css('--ink'); ctx.fill();
+      ctx.fillStyle = css('--surface'); ctx.font = '600 10px ' + css('--f-mono'); ctx.fillText(e.id, px, py + 0.5);
+    });
+    ctx.fillStyle = css('--ink'); ctx.fillRect(12, size - 16, 20 * k, 3);
+    ctx.font = '500 11px ' + css('--f-mono'); ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillText('20 m', 12, size - 20);
+    ctx.textAlign = 'right'; ctx.fillText('N ↑', size - 12, size - 14);
+  }
+
+  // ---------- panel ----------
+  function buildTimeSeg() {
+    $('mTimeSeg').innerHTML = [['all', 'Overlay']].concat(MC.SUN.map((s, i) => [String(i), s.time]))
+      .map(([m, t]) => `<button type="button" data-m="${m}" aria-pressed="${st.mode === m}">${t}</button>`).join('');
+  }
+  function renderPanel() {
+    const o = st.options[st.sel];
+    $('mEmpty').hidden = !!o;
+    $('mTimeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === st.mode));
+    const blk = o && o.buildings[st.selB];
+    ['mRotL', 'mRotR', 'mStDn', 'mStUp'].forEach(id => { $(id).disabled = !blk; });
+    $('mReset').disabled = !(o && o.edited);
+    $('mDl').disabled = $('mConfirm').disabled = !o;
+    $('mHint').textContent = blk ? `Selected ${blk.id} · ${blk.storeys} storeys${blk.group ? ' · moves with its U-block' : ''}` : 'Drag a block to move it. Select one to rotate it or change its storeys.';
+    if (!o) {
+      $('mTitle').textContent = 'Plan';
+      ['mLegend', 'mReadout', 'mChecks', 'mWhy'].forEach(id => { $(id).innerHTML = ''; });
+      const c = $('mPlan'); c.getContext('2d').clearRect(0, 0, c.width, c.height);
+      return;
+    }
+    $('mTitle').textContent = `Option ${st.sel + 1} · ${MC.TYPE_NAME[o.type]}`;
+    draw($('mPlan'), o, st.mode, { labels: true, sel: st.selB, bad: o.comp.sepPair });
+
+    const sw = (c, a, t) => `<span><i class="sw" style="background:var(${c});opacity:${a}"></i>${t}</span>`;
+    $('mLegend').innerHTML = (st.mode === 'all'
+      ? sw('--heat-soft', 1, 'Sun at all 3 moments') + sw('--shade', 0.17, 'Shaded 1 of 3') + sw('--shade', 0.33, '2 of 3') + sw('--shade', 0.5, 'All 3')
+      : sw('--heat-soft', 1, 'In sun') + sw('--shade', 0.5, 'In shade'))
+      + sw('--bldg', 1, 'Building (hatched = void deck)') + sw('--canopy', 0.6, 'Retained tree');
+
+    const ev = o.ev, p = MC.SUN.map(s => Math.round(ev.byTime[s.time] / ev.outdoor * 100) + '%');
+    const sun = st.mode === 'all' ? 'overlay of 11 / 13 / 15 h' : `${MC.SUN[+st.mode].time} (altitude ${MC.SUN[+st.mode].alt}°, azimuth ${MC.SUN[+st.mode].az}°)`;
+    $('mReadout').textContent = `${sun} · shade J ${fmt(ev.J)} m²·h` + (st.baseline ? ` (${signed(ev.J / st.baseline.ev.J - 1)} vs conventional)` : '')
+      + ` · shaded ${p.join(' / ')} at 11 / 13 / 15 h · E/W façade ${fmt(o.ew)} m²` + (o.edited ? ` · edited: ${signed(ev.J / o.origJ - 1)} vs AI option` : '');
+    $('mChecks').innerHTML = o.comp.items.map(c => `<span class="chip ${c.ok ? 'ok' : 'bad'}"><span class="dot"></span>${c.label}</span>`).join('');
+    $('mWhy').innerHTML = MC.explain(o, st.baseline).map(s => `<li>${s}</li>`).join('');
+  }
+
+  // ---------- editing ----------
+  function groupOf(o, i) { const b = o.buildings[i]; return b.group ? o.buildings.filter(x => x.group === b.group) : [b]; }
+  function afterEdit(full) {
+    const o = st.options[st.sel];
+    o.edited = true;
+    MC.refresh(o, full);
+    renderPanel();
+    if (full) renderRail();
+  }
+  function rotateSel(deg) {
+    const o = st.options[st.sel]; if (st.selB < 0) return;
+    const g = groupOf(o, st.selB);
+    const cx = g.reduce((s, b) => s + b.x, 0) / g.length, cy = g.reduce((s, b) => s + b.y, 0) / g.length;
+    for (const b of g) { const [x, y] = MC.local(cx, cy, deg, b.x - cx, b.y - cy); b.x = x; b.y = y; b.rot += deg; }
+    afterEdit(true);
+  }
+  function storeySel(d) {
+    const o = st.options[st.sel], b = o.buildings[st.selB]; if (!b) return;
+    b.storeys = Math.min(60, Math.max(1, b.storeys + d));
+    b.h = Math.round(b.storeys * (b.type === 'carpark' ? MC.RULES.park.floorHeight : o.brief.floorHeight) * 10) / 10;
+    afterEdit(true);
+  }
+  const cv = $('mPlan');
+  const world = e => { const r = cv.getBoundingClientRect(), s = r.width / MC.SITE.W; return [(e.clientX - r.left) / s, MC.SITE.H - (e.clientY - r.top) / s]; };
+  cv.addEventListener('pointerdown', e => {
+    const o = st.options[st.sel]; if (!o) return;
+    const [x, y] = world(e);
+    st.selB = -1;
+    for (let i = o.buildings.length - 1; i >= 0; i--) if (MC.inConvex(MC.corners(o.buildings[i]), x, y)) { st.selB = i; break; }
+    if (st.selB >= 0) { st.drag = { x, y, moved: false }; cv.setPointerCapture(e.pointerId); cv.style.cursor = 'grabbing'; }
+    renderPanel();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!st.drag) return;
+    const o = st.options[st.sel], [x, y] = world(e);
+    const dx = Math.round((x - st.drag.x) * 2) / 2, dy = Math.round((y - st.drag.y) * 2) / 2;
+    if (!dx && !dy) return;
+    for (const b of groupOf(o, st.selB)) { b.x += dx; b.y += dy; }
+    st.drag.x += dx; st.drag.y += dy; st.drag.moved = true;
+    if (!st.live) st.live = requestAnimationFrame(() => { st.live = 0; afterEdit(false); });
+  });
+  const endDrag = () => {
+    if (!st.drag) return;
+    const moved = st.drag.moved; st.drag = null; cv.style.cursor = '';
+    if (moved) afterEdit(true);
+  };
+  cv.addEventListener('pointerup', endDrag);
+  cv.addEventListener('pointercancel', endDrag);
+
+  // ---------- export / hand-off ----------
+  function flash(msg) { $('mToast').textContent = msg; clearTimeout(flash.t); flash.t = setTimeout(() => { $('mToast').textContent = ''; }, 3500); }
+  $('mDl').addEventListener('click', () => {
+    const o = st.options[st.sel];
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(MC.toLayout(o, st.seed), null, 2)], { type: 'application/json' }));
+    a.download = `layout-${o.type}-${st.seed}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    flash('Download started');
+  });
+  $('mConfirm').addEventListener('click', () => {
+    const layout = MC.toLayout(st.options[st.sel], st.seed);
+    try { localStorage.setItem('cooling.layout', JSON.stringify(layout)); } catch (e) { /* hand-off below still works */ }
+    st.confirmed = st.sel; renderRail();
+    window.Stages.toLandscape(layout);
+  });
+
+  $('mTimeSeg').addEventListener('click', e => { const m = e.target.dataset.m; if (m !== undefined) { st.mode = m; renderPanel(); } });
+  $('mRotL').addEventListener('click', () => rotateSel(15));
+  $('mRotR').addEventListener('click', () => rotateSel(-15));
+  $('mStDn').addEventListener('click', () => storeySel(-1));
+  $('mStUp').addEventListener('click', () => storeySel(1));
+  $('mReset').addEventListener('click', () => {
+    const o = st.options[st.sel];
+    o.buildings = MC.clone(o.orig); o.edited = false; st.selB = -1;
+    MC.refresh(o, true); renderRail(); renderPanel();
+  });
+  $('mGen').addEventListener('click', generate);
+  $('mShuffle').addEventListener('click', () => { st.seed++; generate(); });
+
+  const redraw = () => { if (!$('stage1').hidden) { renderRail(); renderPanel(); } };
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(redraw, 120); });
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw); } catch (e) {}
+
+  window.MUI = { redraw };
+  renderBrief(); buildTimeSeg(); renderRail(); renderPanel();
+})();
+</script>
+
+<script>
+/* ===== Stage switcher ===== */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const DESC = {
+    1: 'Six massing options that maximise outdoor shade at the hottest hours. Pick one on intuition, edit it, then hand it to landscape.',
+    2: 'Same 40 trees, three planting strategies: which one keeps paths and seats coolest at the hottest moments.'
+  };
+  function show(n) {
+    $('stage1').hidden = n !== 1; $('stage2').hidden = n !== 2; $('lsStatus').hidden = n !== 2;
+    $('go1').setAttribute('aria-pressed', n === 1); $('go2').setAttribute('aria-pressed', n === 2);
+    $('stageName').textContent = n === 1 ? 'Massing' : 'Landscape';
+    $('stageDesc').textContent = DESC[n];
+    window.scrollTo({ top: 0 });
+  }
+  window.Stages = { toLandscape(layout) { show(2); LSUI.run(layout, 'handoff'); } };
+  $('go1').addEventListener('click', () => { show(1); MUI.redraw(); });
+  $('go2').addEventListener('click', () => { show(2); if (LSUI.ready()) LSUI.redraw(); else LSUI.start(); });
+  show(1);
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function () {
+if (!window.THREE || !THREE.OrbitControls) { window.LS3D_FAILED = true; window.dispatchEvent(new Event('ls3d-ready')); return; }
+
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let renderer, scene, camera, controls, sunLight, raf, host, ro;
+
+function clear() {
+  if (raf) cancelAnimationFrame(raf); raf = null;
+  if (ro) { ro.disconnect(); ro = null; }
+  if (renderer) { renderer.dispose(); renderer.domElement.remove(); renderer = null; }
+  scene = null;
+}
+function build(container, R, opt) {
+  clear(); host = container;
+  const P = R.P, G = P.G, W = G.W, H = G.H;
+  // site (x, y) -> three (x, 0, -y); centre the site on the origin
+  const tx = x => x - W / 2, tz = y => -(y - H / 2);
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(css('--ground'));
+  camera = new THREE.PerspectiveCamera(40, 1, 1, 2000);
+  camera.position.set(150, 165, 200);
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 10, 0); controls.maxPolarAngle = Math.PI * 0.48; controls.enableDamping = true;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, new THREE.Color(css('--bldg')), 0.5));
+  sunLight = new THREE.DirectionalLight(0xfff4e0, 0.7);
+  sunLight.castShadow = true; sunLight.shadow.mapSize.set(2048, 2048);
+  Object.assign(sunLight.shadow.camera, { left: -150, right: 150, top: 150, bottom: -150, near: 1, far: 800 });
+  sunLight.shadow.bias = -0.0005;
+  scene.add(sunLight); scene.add(sunLight.target);
+
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshStandardMaterial({ color: new THREE.Color(css('--ground')).multiplyScalar(0.36), roughness: 1 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+
+  // activity areas
+  P.areas.forEach(a => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(a.w, a.d), new THREE.MeshStandardMaterial({ color: new THREE.Color(css('--a-' + a.type)).multiplyScalar(0.5), roughness: 1, transparent: true, opacity: 0.85 }));
+    m.rotation.x = -Math.PI / 2; m.position.set(tx(a.x0 + a.w / 2), 0.05, tz(a.y0 + a.d / 2)); m.receiveShadow = true; scene.add(m);
+  });
+  // paths
+  const pathMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(css('--path')).multiplyScalar(0.42), roughness: 1 });
+  P.paths.forEach(p => { for (let i = 1; i < p.polyline.length; i++) {
+    const [ax, ay] = p.polyline[i - 1], [bx, by] = p.polyline[i], L = Math.hypot(bx - ax, by - ay); if (L < 0.1) continue;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(L + 2.4, 0.08, 2.4), pathMat);
+    m.position.set(tx((ax + bx) / 2), 0.08, tz((ay + by) / 2)); m.rotation.y = Math.atan2(by - ay, bx - ax); m.receiveShadow = true; scene.add(m);
+  } });
+  // buildings
+  const bMat = new THREE.MeshStandardMaterial({ color: css('--bldg'), roughness: 0.85 });
+  P.layout.buildings.forEach(b => {
+    const base = b.voidDeck ? 3 : 0, hh = b.h - base, rot = b.rot * Math.PI / 180;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(b.w, hh, b.d), bMat);
+    m.position.set(tx(b.x), base + hh / 2, tz(b.y)); m.rotation.y = rot; m.castShadow = true; m.receiveShadow = true; scene.add(m);
+    if (b.voidDeck) {
+      const c = Math.cos(rot), s = Math.sin(rot);
+      for (const [dx, dy] of [[-1, -1], [1, -1], [1, 1], [-1, 1], [0, -1], [0, 1]]) {
+        const lx = dx * (b.w / 2 - 1), ly = dy * (b.d / 2 - 1);
+        const col = new THREE.Mesh(new THREE.BoxGeometry(1, 3, 1), bMat);
+        col.position.set(tx(b.x + lx * c - ly * s), 1.5, tz(b.y + lx * s + ly * c)); col.castShadow = true; scene.add(col);
+      }
+    }
+  });
+  // trees (existing + new)
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6b5338, roughness: 1 });
+  const leafNew = new THREE.MeshStandardMaterial({ color: css('--canopy'), roughness: 0.9 });
+  const leafOld = new THREE.MeshStandardMaterial({ color: new THREE.Color(css('--canopy')).multiplyScalar(0.7), roughness: 0.9 });
+  opt.trees.forEach(t => {
+    const crownH = t.r * 0.75;
+    const trunkTop = Math.max(1.5, t.h - crownH * 0.6);
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, trunkTop, 8), trunkMat);
+    trunk.position.set(tx(t.x), trunkTop / 2, tz(t.y)); trunk.castShadow = true; scene.add(trunk);
+    const crown = new THREE.Mesh(new THREE.SphereGeometry(t.r, 18, 12), t.existing ? leafOld : leafNew);
+    crown.scale.set(1, 0.75, 1); crown.position.set(tx(t.x), t.h, tz(t.y)); crown.castShadow = true; crown.receiveShadow = true; scene.add(crown);
+  });
+  // seats: green if shaded in >= 2 of 3 hot hours
+  const shadedHours = st => st.perTime.reduce((a, v, i) => a + (v >= 0.8 ? P.sun[i].hours : 0), 0) / P.hoursTotal;
+  const seatOk = new THREE.MeshStandardMaterial({ color: css('--canopy') }), seatBad = new THREE.MeshStandardMaterial({ color: css('--heat') });
+  opt.seats.forEach(st => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.45, 0.5), shadedHours(st) >= 0.66 ? seatOk : seatBad);
+    m.position.set(tx(st.x), 0.25, tz(st.y)); m.castShadow = true; scene.add(m);
+  });
+
+  const resize = () => { const w = container.clientWidth, h = container.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); };
+  ro = new ResizeObserver(resize); ro.observe(container); resize();
+  const loop = () => { controls.update(); renderer.render(scene, camera); raf = requestAnimationFrame(loop); };
+  loop();
+}
+function setSun({ alt, az }) {
+  if (!sunLight) return;
+  const a = alt * Math.PI / 180, z = az * Math.PI / 180, D = 300;
+  // site east = +x, north = -z in three
+  sunLight.position.set(D * Math.cos(a) * Math.sin(z), D * Math.sin(a), -D * Math.cos(a) * Math.cos(z));
+  sunLight.target.position.set(0, 0, 0);
+  sunLight.intensity = alt > 0 ? 0.7 : 0;
+}
+window.LS3D = { build, setSun, clear };
+window.dispatchEvent(new Event('ls3d-ready'));
+})();
+</script>
+
+</body>
+</html>
