@@ -7,291 +7,241 @@
 <meta name="description" content="Shade the estate from the first sketch: an early-stage design tool that scores building layouts and tree planting by outdoor shade in Singapore's hottest hours.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">
 <style>
-body{margin:0;background:#F3F4EF}
-a{color:#2D7448}a:hover{color:#1E5233}
-img{max-width:100%;display:block}
+:root {
+  --ink: #16201A; --paper: #F3F4EF; --card: #FFFFFF; --line: #D6DCD5; --line-soft: #E3E8E2;
+  --muted: #55635A; --body: #3E4B43; --green: #2D7448; --green-l: #7FCB98; --heat: #C9481F; --heat-l: #F08A60;
+  --hero-card: #1C2820; --hero-line: #2F3D33; --hero-ink: #EEF2EC; --hero-muted: #A9BBAE; --hero-body: #C9D5CC;
+  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Archivo', system-ui, sans-serif; font-size: 17px; line-height: 1.55; }
+img { max-width: 100%; display: block; }
+a { color: var(--green); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+.kicker { font: 500 12.5px/1.3 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+.k-heat { color: var(--heat); } .k-green { color: var(--green); }
+
+/* ---------- first screen: problem + impact ---------- */
+.hero { background: var(--ink); color: var(--hero-ink); padding: 30px 0 40px; }
+.eyebrow { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 13px/1.4 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--hero-muted); }
+.eyebrow b { color: var(--green-l); font-weight: 500; }
+.hero-top { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: flex-end; justify-content: space-between; margin: 14px 0 22px; }
+h1 { margin: 0; max-width: 17ch; font-size: clamp(34px, 4.6vw, 58px); line-height: 1.02; font-weight: 750; font-stretch: 112%; letter-spacing: -.02em; text-wrap: balance; }
+.cta { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 999px; background: var(--green-l); color: var(--ink); font-weight: 700; font-size: 17px; text-decoration: none; }
+.btn:hover { background: #9AD8AE; color: var(--ink); }
+.cta .note { font: 500 12.5px var(--f-mono); color: var(--hero-muted); }
+.pi { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; }
+.pcard { background: var(--hero-card); border: 1px solid var(--hero-line); border-radius: 14px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+.pcard .k-heat { color: var(--heat-l); } .pcard .k-green { color: var(--green-l); }
+.pcard h2 { margin: 0; font-size: 26px; line-height: 1.15; font-weight: 720; font-stretch: 106%; text-wrap: balance; }
+.pcard ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--hero-body); font-size: 15.5px; }
+.pcard ul strong { color: var(--hero-ink); font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--hero-line); border: 1px solid var(--hero-line); border-radius: 10px; overflow: hidden; }
+.stat { background: var(--ink); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.stat .v { font: 700 28px/1.1 var(--f-mono); }
+.stat .l { font-size: 13px; color: var(--hero-muted); line-height: 1.35; }
+.heat { color: var(--heat-l); } .green { color: var(--green-l); }
+.strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: auto; }
+.strip figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.strip img { border-radius: 8px; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--hero-line); }
+.strip figcaption { font: 500 12.5px var(--f-mono); color: var(--hero-muted); display: flex; justify-content: space-between; gap: 6px; }
+.strip .hot img { border: 2px solid var(--heat-l); }
+.strip .hot figcaption { color: var(--heat-l); }
+.fine { margin: 0; font-size: 12.5px; color: var(--hero-muted); }
+
+/* ---------- sections ---------- */
+main.wrap { padding-top: 64px; display: flex; flex-direction: column; gap: 88px; }
+.sec-head { display: flex; flex-direction: column; gap: 10px; max-width: 780px; margin-bottom: 28px; }
+.sec-head h2 { margin: 0; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.08; font-weight: 720; font-stretch: 108%; letter-spacing: -.015em; text-wrap: balance; }
+
+.band { background: var(--ink); color: var(--hero-ink); border-radius: 16px; padding: clamp(22px, 4vw, 44px); display: flex; flex-direction: column; gap: 24px; }
+.band .sec-head { margin: 0; }
+.band .kicker { color: var(--green-l); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.pair figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.pair img { border-radius: 10px; aspect-ratio: 1; object-fit: cover; }
+.pair figcaption { font: 500 13px var(--f-mono); color: var(--hero-muted); }
+.deltas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 1px; background: var(--hero-line); border-radius: 10px; overflow: hidden; }
+.deltas div { background: var(--hero-card); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+.deltas .l { font-size: 14px; color: var(--hero-muted); }
+.deltas .v { font: 700 24px/1.2 var(--f-mono); }
+.deltas .v span { color: var(--green-l); }
+
+.flow { list-style: none; margin: 0 0 28px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 14px; }
+.flow li { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.flow li.ai { border-color: var(--green); }
+.flow .n { font: 700 14px var(--f-mono); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--hero-ink); }
+.flow li.ai .n { background: var(--green); color: #fff; }
+.flow b { font-size: 16px; line-height: 1.3; font-weight: 650; }
+.flow .who { font: 500 11.5px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: auto; }
+.flow li.ai .who { color: var(--green); }
+@media (min-width: 1000px) {
+  .flow { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .flow li:not(:last-child)::after { content: '→'; position: absolute; right: -13px; top: 18px; font: 700 15px var(--f-mono); color: var(--muted); }
+}
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
+.shots figure, .three figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.shots img { border-radius: 10px; border: 1px solid var(--line); }
+.shots figcaption, .three figcaption { font: 500 13px var(--f-mono); color: var(--muted); }
+.three { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; margin-top: 20px; }
+.three img { border-radius: 10px; border: 1px solid var(--line); aspect-ratio: 2580 / 1042; object-fit: cover; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+.card h3 { margin: 0; font-size: 20px; font-weight: 700; font-stretch: 104%; }
+.card p { margin: 0; color: var(--body); font-size: 15.5px; }
+.card .big { font: 700 32px/1.1 var(--f-mono); color: var(--green); }
+
+.limits { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--body); max-width: 820px; }
+.limits strong { color: var(--ink); }
+
+footer { border-top: 1px solid var(--line); padding: 24px 0 40px; display: flex; flex-wrap: wrap; gap: 14px 32px; align-items: center; justify-content: space-between; }
+footer .btn { font-size: 16px; }
+footer p { margin: 0; font-size: 13px; color: var(--muted); max-width: 70ch; }
 </style>
 </head>
 <body>
-<div style="font-family: 'Archivo', system-ui, sans-serif; color: #16201A; background: #F3F4EF; line-height: 1.55; font-size: 17px">
 
-  <!-- HERO -->
-  <header style="background: #16201A; color: #EEF2EC; padding: 56px 24px 0">
-    <div style="max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px">
-      <div style="display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #A9BBAE">
-        <span style="color: #7FCB98">Cooler Estates</span>
-        <span>Hackathon prototype · Singapore · Oct 2026</span>
+<!-- ================= first screen: problem + impact ================= -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><b>Cooler Estates</b><span>Hackathon prototype · Singapore · Oct 2026</span></div>
+    <div class="hero-top">
+      <h1>Shade the estate from the first sketch.</h1>
+      <div class="cta">
+        <a class="btn" href="./app.html">Open the tool →</a>
+        <span class="note">Runs in your browser · nothing to install</span>
       </div>
-      <h1 style="margin: 0; font-size: clamp(40px, 6.4vw, 84px); line-height: 1.02; font-weight: 750; font-stretch: 112%; letter-spacing: -0.02em; max-width: 15ch; text-wrap: balance">Shade the estate from the first sketch.</h1>
-      <p style="margin: 0; max-width: 60ch; font-size: 19px; color: #C9D5CC">You set the planning brief, pick a building layout, then pick how to plant the trees. At every step you see how much of the outdoor space stays shaded in the hottest hours of the day.</p>
-      <div style="display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center">
-        <a href="./app.html" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 999px; background: #7FCB98; color: #16201A; font-weight: 700; font-size: 17px; text-decoration: none">Open the tool →</a>
-        <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #A9BBAE">Runs in your browser · nothing to install</span>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: #2F3D33; border: 1px solid #2F3D33; border-radius: 10px; overflow: hidden">
-        <div style="background: #16201A; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px">
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: #EEF2EC">86.6°</span>
-          <span style="font-size: 14px; color: #A9BBAE">sun altitude at 13:00 on the equinox</span>
-        </div>
-        <div style="background: #16201A; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px">
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: #F08A60">3.3%</span>
-          <span style="font-size: 14px; color: #A9BBAE">of outdoor space shaded by buildings at 13:00</span>
-        </div>
-        <div style="background: #16201A; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px">
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: #7FCB98">3×</span>
-          <span style="font-size: 14px; color: #A9BBAE">more shade at 13:00 with 40 well-placed trees</span>
-        </div>
-      </div>
-      <figure style="margin: 8px 0 -120px; display: flex; flex-direction: column; gap: 10px">
-        <img src="./assets/83c13659fbf4a9cced8936ed8f288ded.png" alt="3D model of the sample estate at 15:00: six blocks, trees around a playground and plaza, long shadows falling east" style="width: 100%; border-radius: 12px; border: 1px solid #2F3D33; background: #ECE6D6">
-        <figcaption style="font-size: 13px; color: #55635A; font-family: 'JetBrains Mono', monospace; padding-top: 2px">Sample estate at 15:00 · scheme C · 200 × 200 m site, five residential blocks and a car park</figcaption>
-      </figure>
     </div>
-  </header>
 
-  <main style="max-width: 1180px; margin: 0 auto; padding: 172px 24px 80px; display: flex; flex-direction: column; gap: 112px">
-
-    <!-- PROBLEM -->
-    <section style="display: flex; flex-direction: column; gap: 28px">
-      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 760px">
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #C9481F">The problem</span>
-        <h2 style="margin: 0; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; font-weight: 720; font-stretch: 108%; letter-spacing: -0.015em; text-wrap: balance">At 1 pm, the buildings stop helping.</h2>
-        <p style="margin: 0; color: #3E4B43">Singapore is close to the equator, so the midday sun is almost overhead. A 30-storey block that casts a long shadow in the morning casts almost none at 1 pm. Outdoor shade is usually left to the landscape stage, after the building layout is already fixed.</p>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px">
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">
-          <img src="./assets/8a0e0cc1ad57e86178e1afb04d24f902.png" alt="Site plan at 11:00 with long building shadows falling west" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; border: 1px solid #D6DCD5">
-          <figcaption style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; border-top: 2px solid #16201A; padding-top: 10px">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 20px">11:00</span>
-            <span style="font-size: 14px; color: #55635A; text-align: right">sun 56.9° · <strong style="color: #16201A">8,592 m²</strong> shaded (25%)</span>
-          </figcaption>
-        </figure>
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">
-          <img src="./assets/d9168d9940c5f5a4dff2e5f2e936781f.png" alt="Site plan at 13:00 with almost no building shadow" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; border: 2px solid #C9481F">
-          <figcaption style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; border-top: 2px solid #C9481F; padding-top: 10px">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 20px; color: #C9481F">13:00</span>
-            <span style="font-size: 14px; color: #55635A; text-align: right">sun 86.6° · <strong style="color: #C9481F">1,148 m²</strong> shaded (3.3%)</span>
-          </figcaption>
-        </figure>
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">
-          <img src="./assets/96ddba57c7d67f2e03f3426f61b4a3bb.png" alt="Site plan at 15:00 with building shadows falling east" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; border: 1px solid #D6DCD5">
-          <figcaption style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; border-top: 2px solid #16201A; padding-top: 10px">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 20px">15:00</span>
-            <span style="font-size: 14px; color: #55635A; text-align: right">sun 63.0° · <strong style="color: #16201A">6,976 m²</strong> shaded (20%)</span>
-          </figcaption>
-        </figure>
-      </div>
-      <p style="margin: 0; font-size: 14px; color: #55635A">Building shadows only (blue), sample estate, equinox. The hottest hour is the one the buildings cannot shade, so trees and canopies have to do that work.</p>
-    </section>
-
-    <!-- HOW YOU USE IT -->
-    <section style="display: flex; flex-direction: column; gap: 56px">
-      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 760px">
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #2D7448">How you use it</span>
-        <h2 style="margin: 0; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; font-weight: 720; font-stretch: 108%; letter-spacing: -0.015em; text-wrap: balance">Five steps, two decisions.</h2>
-        <p style="margin: 0; color: #3E4B43">The architect picks the building layout. The landscape architect picks the planting. The tool proposes options and scores them; you make the calls.</p>
-      </div>
-
-      <!-- step 1 -->
-      <article style="display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: center">
-        <div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
-          <div style="display: flex; gap: 12px; align-items: center">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #16201A; color: #EEF2EC">1</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #55635A">Architect</span>
-          </div>
-          <h3 style="margin: 0; font-size: 28px; line-height: 1.15; font-weight: 700; font-stretch: 106%">Enter the planning brief</h3>
-          <p style="margin: 0; color: #3E4B43">Start with the numbers you already have at concept stage. Every field is pre-filled and editable, and the outdoor programme carries through to the landscape step.</p>
-        </div>
-        <div style="flex: 1 1 460px; min-width: 0; background: #FFFFFF; border: 1px solid #D6DCD5; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px">
-            <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #E3E8E2; padding-bottom: 10px"><span style="font-size: 13px; color: #55635A">Site area</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700">40,000 m²</span></div>
-            <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #E3E8E2; padding-bottom: 10px"><span style="font-size: 13px; color: #55635A">Plot ratio</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700">2.8</span></div>
-            <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #E3E8E2; padding-bottom: 10px"><span style="font-size: 13px; color: #55635A">Max site coverage</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700">25%</span></div>
-            <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #E3E8E2; padding-bottom: 10px"><span style="font-size: 13px; color: #55635A">Max storeys</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700">30</span></div>
-            <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #E3E8E2; padding-bottom: 10px"><span style="font-size: 13px; color: #55635A">Floor height</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700">2.8 m</span></div>
-            <div style="display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #E3E8E2; padding-bottom: 10px"><span style="font-size: 13px; color: #55635A">Green ratio</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700">30%</span></div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <span style="font-size: 13px; color: #55635A">Outdoor programme</span>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px">
-              <span style="padding: 5px 12px; border-radius: 999px; background: #F7E9C8; color: #6B4A08; font-size: 14px">Playground 600 m²</span>
-              <span style="padding: 5px 12px; border-radius: 999px; background: #E6E2F6; color: #43378A; font-size: 14px">Plaza 800 m²</span>
-              <span style="padding: 5px 12px; border-radius: 999px; background: #D7EEEC; color: #1C5F5A; font-size: 14px">Fitness 300 m²</span>
-              <span style="padding: 5px 12px; border-radius: 999px; background: #E7F0CF; color: #4A5E12; font-size: 14px">Community garden 400 m²</span>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- step 2 -->
-      <article style="display: flex; flex-wrap: wrap-reverse; gap: 32px 48px; align-items: center">
-        <div style="flex: 1 1 460px; min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
-          <figure style="margin: 0; display: flex; flex-direction: column; gap: 6px"><img src="./assets/8a0e0cc1ad57e86178e1afb04d24f902.png" alt="Layout shade at 11:00" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; border: 1px solid #D6DCD5"><figcaption style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #55635A">11:00 · 8,592 m²</figcaption></figure>
-          <figure style="margin: 0; display: flex; flex-direction: column; gap: 6px"><img src="./assets/d9168d9940c5f5a4dff2e5f2e936781f.png" alt="Layout shade at 13:00" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; border: 1px solid #D6DCD5"><figcaption style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #55635A">13:00 · 1,148 m²</figcaption></figure>
-          <figure style="margin: 0; display: flex; flex-direction: column; gap: 6px"><img src="./assets/96ddba57c7d67f2e03f3426f61b4a3bb.png" alt="Layout shade at 15:00" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; border: 1px solid #D6DCD5"><figcaption style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #55635A">15:00 · 6,976 m²</figcaption></figure>
-          <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; background: #FFFFFF; border: 1px solid #D6DCD5; border-radius: 8px; padding: 12px 16px; font-size: 14px">
-            <span><strong>Option sample-01</strong> · parallel slabs</span>
-            <span style="font-family: 'JetBrains Mono', monospace">shade score 33,432 m²·h</span>
-          </div>
-        </div>
-        <div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
-          <div style="display: flex; gap: 12px; align-items: center">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #16201A; color: #EEF2EC">2</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #55635A">Architect · decision 1</span>
-          </div>
-          <h3 style="margin: 0; font-size: 28px; line-height: 1.15; font-weight: 700; font-stretch: 106%">Pick a layout with its shade in view</h3>
-          <p style="margin: 0; color: #3E4B43">The tool generates six layouts that meet the brief across six block typologies, and scores each by shaded outdoor area at 11:00, 13:00 and 15:00. You weigh that against views, access and everything else you know, choose one, and adjust the blocks. The shade updates as you move them.</p>
-        </div>
-      </article>
-
-      <!-- step 3 -->
-      <article style="display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: center">
-        <div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
-          <div style="display: flex; gap: 12px; align-items: center">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #2D7448; color: #FFFFFF">3</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #55635A">Landscape architect</span>
-          </div>
-          <h3 style="margin: 0; font-size: 28px; line-height: 1.15; font-weight: 700; font-stretch: 106%">See where people will walk and stay</h3>
-          <p style="margin: 0; color: #3E4B43">The chosen layout arrives in the landscape view. Walking routes are traced from the bus stop and the pedestrian gate to every block, passing under void decks. Activity areas are placed by need: the playground in shade near homes, the community garden in full sun. Seats go where people will need them, not where shade already is.</p>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13.5px; color: #55635A">
-            <span style="display: inline-flex; gap: 6px; align-items: center"><span style="width: 12px; height: 12px; border-radius: 50%; background: #C9481F"></span>unshaded walk</span>
-            <span style="display: inline-flex; gap: 6px; align-items: center"><span style="width: 12px; height: 12px; background: #2D7448"></span>seat in shade</span>
-            <span style="display: inline-flex; gap: 6px; align-items: center"><span style="width: 12px; height: 12px; background: #C9481F"></span>seat in sun</span>
-          </div>
-        </div>
-        <figure style="flex: 1 1 460px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 8px">
-          <img src="./assets/fefc3c09181ead8d4eea47249dd33651.png" alt="Site plan with walking routes from entrances E2 and E3, playground, plaza, fitness area, community garden and seats" style="width: 100%; max-width: 560px; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; border: 1px solid #D6DCD5">
-          <figcaption style="font-size: 13px; color: #55635A; font-family: 'JetBrains Mono', monospace">10 walking routes · 4 activity areas · 26 seats</figcaption>
-        </figure>
-      </article>
-
-      <!-- step 4 -->
-      <article style="display: flex; flex-direction: column; gap: 24px">
-        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 720px">
-          <div style="display: flex; gap: 12px; align-items: center">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #2D7448; color: #FFFFFF">4</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #55635A">Landscape architect · decision 2</span>
-          </div>
-          <h3 style="margin: 0; font-size: 28px; line-height: 1.15; font-weight: 700; font-stretch: 106%">Compare three ways to plant the same 40 trees</h3>
-          <p style="margin: 0; color: #3E4B43">Each scheme gets the same trees, so the difference is only where they go. You compare them on the three things people feel at 1 pm: how much ground is shaded, how many seats are in shade, and the longest stretch of walk with no shade.</p>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
-          <figure style="margin: 0; background: #FFFFFF; border: 1px solid #D6DCD5; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
-            <img src="./assets/d7bbbe9250a66e60db9e9ce7a6db89d5.png" alt="Scheme A: trees lining the most exposed walking routes" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover">
-            <figcaption style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 10px">
-              <div style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; background: #16201A; color: #EEF2EC; border-radius: 6px; padding: 1px 8px">A</span><strong style="font-size: 19px">Shade corridor</strong></div>
-              <span style="font-size: 14px; color: #55635A">Trees line the most exposed stretches of walk.</span>
-              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 14px; border-top: 1px solid #E3E8E2; padding-top: 10px">
-                <span style="color: #55635A">Shaded at 13:00</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right">4,308 m²</span>
-                <span style="color: #55635A">Seats in shade</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right">59%</span>
-                <span style="color: #55635A">Longest unshaded walk</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right; color: #2D7448; font-weight: 700">32 m · best</span>
-              </div>
-            </figcaption>
-          </figure>
-          <figure style="margin: 0; background: #FFFFFF; border: 1px solid #D6DCD5; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
-            <img src="./assets/22fedf314d9ce21cf9306371ccbb4036.png" alt="Scheme B: tree groves over the playground, plaza and fitness area" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover">
-            <figcaption style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 10px">
-              <div style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; background: #16201A; color: #EEF2EC; border-radius: 6px; padding: 1px 8px">B</span><strong style="font-size: 19px">Activity first</strong></div>
-              <span style="font-size: 14px; color: #55635A">Groves cover the playground, plaza and fitness area.</span>
-              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 14px; border-top: 1px solid #E3E8E2; padding-top: 10px">
-                <span style="color: #55635A">Shaded at 13:00</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right">3,536 m²</span>
-                <span style="color: #55635A">Seats in shade</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right">65%</span>
-                <span style="color: #55635A">Longest unshaded walk</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right; color: #C9481F; font-weight: 700">114 m · unchanged</span>
-              </div>
-            </figcaption>
-          </figure>
-          <figure style="margin: 0; background: #FFFFFF; border: 2px solid #2D7448; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
-            <img src="./assets/1b75287802f0b97063596b5e21024291.png" alt="Scheme C: trees placed one by one by the optimiser next to seats, paths and the playground" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover">
-            <figcaption style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 10px">
-              <div style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; background: #2D7448; color: #FFFFFF; border-radius: 6px; padding: 1px 8px">C</span><strong style="font-size: 19px">Optimised</strong></div>
-              <span style="font-size: 14px; color: #55635A">Each tree goes where it adds the most shade to seats, walks and the playground, and is kept off the community garden.</span>
-              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 14px; border-top: 1px solid #E3E8E2; padding-top: 10px">
-                <span style="color: #55635A">Shaded at 13:00</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right">4,304 m²</span>
-                <span style="color: #55635A">Seats in shade</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right; color: #2D7448; font-weight: 700">95% · best</span>
-                <span style="color: #55635A">Longest unshaded walk</span><span style="font-family: 'JetBrains Mono', monospace; text-align: right">42 m</span>
-              </div>
-            </figcaption>
-          </figure>
-        </div>
-        <p style="margin: 0; font-size: 14px; color: #55635A">Without new trees: 1,380 m² shaded at 13:00, 24% of seats in shade, a 114 m walk with no shade. Plans show 13:00.</p>
-      </article>
-
-      <!-- step 5 -->
-      <article style="display: flex; flex-direction: column; gap: 24px">
-        <div style="display: flex; flex-wrap: wrap; gap: 16px 48px; align-items: flex-end; justify-content: space-between">
-          <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px; max-width: 720px">
-            <div style="display: flex; gap: 12px; align-items: center">
-              <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #2D7448; color: #FFFFFF">5</span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #55635A">Landscape architect</span>
-            </div>
-            <h3 style="margin: 0; font-size: 28px; line-height: 1.15; font-weight: 700; font-stretch: 106%">Check it in 3D through the day, then hand it on</h3>
-            <p style="margin: 0; color: #3E4B43">Drag the time slider from 10:00 to 16:00 and watch the shadows swing from west to east. When you are happy, export the layout with its trees, seats, routes and scores as one file for the next design stage.</p>
-          </div>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px">
-          <figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
-            <img src="./assets/2032da37a5c9cbc2f0901ebdbb70e119.png" alt="3D model at 11:00 with shadows falling west" style="width: 100%; border-radius: 10px; border: 1px solid #D6DCD5; background: #ECE6D6">
-            <figcaption style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #55635A">11:00 · shadows fall west</figcaption>
-          </figure>
-          <figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
-            <img src="./assets/627811bad3563a882bac901152b69022.png" alt="3D model at 13:00 with shadows directly under trees and blocks" style="width: 100%; border-radius: 10px; border: 1px solid #D6DCD5; background: #ECE6D6">
-            <figcaption style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #55635A">13:00 · shade only directly under trees</figcaption>
-          </figure>
-        </div>
-      </article>
-    </section>
-
-    <!-- BEFORE / AFTER -->
-    <section style="display: flex; flex-direction: column; gap: 28px; background: #16201A; color: #EEF2EC; border-radius: 16px; padding: clamp(24px, 4vw, 48px)">
-      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 760px">
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #7FCB98">Before and after · 13:00</span>
-        <h2 style="margin: 0; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; font-weight: 720; font-stretch: 108%; letter-spacing: -0.015em; text-wrap: balance">Same blocks. Forty trees. Three times the shade.</h2>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
-          <img src="./assets/2c972ff5fcb449b71a35cc976c9c94d4.png" alt="13:00 without new trees: walking routes mostly exposed, most seats in sun" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px">
-          <figcaption style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A9BBAE">Buildings and two existing trees only</figcaption>
-        </figure>
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
-          <img src="./assets/1b75287802f0b97063596b5e21024291.png" alt="13:00 with scheme C: most seats shaded, shorter unshaded walks" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px">
-          <figcaption style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A9BBAE">With scheme C</figcaption>
-        </figure>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: #2F3D33; border-radius: 10px; overflow: hidden">
-        <div style="background: #1C2820; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; color: #A9BBAE">Shaded ground at 13:00</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700">1,380 → <span style="color: #7FCB98">4,304 m²</span></span></div>
-        <div style="background: #1C2820; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; color: #A9BBAE">Seats in shade</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700">24% → <span style="color: #7FCB98">95%</span></span></div>
-        <div style="background: #1C2820; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; color: #A9BBAE">Longest unshaded walk</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 700">114 → <span style="color: #7FCB98">42 m</span></span></div>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS / LIMITS -->
-    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px">
-      <div style="display: flex; flex-direction: column; gap: 12px">
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #2D7448">How the numbers are made</span>
-        <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; color: #3E4B43">
-          <li>Shadows are projected from block and tree geometry on a 2 m grid, for the equinox at 11:00, 13:00 and 15:00, each standing for two hours.</li>
-          <li>A tree canopy lets 20% of sunlight through. A spot counts as shaded when at least 80% of the sun is blocked.</li>
-          <li>The building and landscape shade engines were written separately by two teammates and agree to within 0.1%.</li>
-          <li>Everything runs in the browser in under a second, using only data you have at concept stage.</li>
+    <div class="pi">
+      <section class="pcard" aria-labelledby="problem">
+        <span class="kicker k-heat">1 · Problem</span>
+        <h2 id="problem">Outdoor comfort is checked last.</h2>
+        <ul>
+          <li>Outdoor thermal comfort is checked last: <strong>architects fix the blocks, and landscape is left to fix the heat.</strong></li>
+          <li>In Singapore’s hottest hours the sun is almost overhead (86.6° at 13:00), so buildings shade only <strong>~4% of the outdoor space</strong>. Trees do the midday work, but they get planted into whatever space is left.</li>
         </ul>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 12px">
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #C9481F">What it does not do yet</span>
-        <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; color: #3E4B43">
-          <li>Shade is geometric, not thermal comfort. Next: check the ranking against UTCI and mean radiant temperature.</li>
-          <li>One day only. June and December, when shadows swing north and south, are not covered.</li>
-          <li>Wind is not modelled, so a denser layout can score well on shade while blocking the monsoon breeze.</li>
-          <li>All new trees are one size, with no growth stages. Walking routes are shortest paths, while real people seek shade.</li>
-        </ul>
-      </div>
-    </section>
+        <div class="strip">
+          <figure><img src="./assets/massing-1100.png" alt="Building shadows at 11:00 covering 39% of the outdoor space"><figcaption><span>11:00</span><span>39%</span></figcaption></figure>
+          <figure class="hot"><img src="./assets/massing-1300.png" alt="Building shadows at 13:00 covering only 4% of the outdoor space"><figcaption><span>13:00</span><span>4%</span></figcaption></figure>
+          <figure><img src="./assets/massing-1500.png" alt="Building shadows at 15:00 covering 32% of the outdoor space"><figcaption><span>15:00</span><span>32%</span></figcaption></figure>
+        </div>
+        <p class="fine">Outdoor space shaded by buildings (blue), equinox. At 13:00 the blocks cast almost nothing.</p>
+      </section>
 
-    <footer style="border-top: 1px solid #D6DCD5; padding-top: 20px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-size: 13px; color: #55635A; font-family: 'JetBrains Mono', monospace">
-      <span>Cooler Estates · hackathon prototype</span>
-      <a href="./app.html">Open the tool →</a>
-      <span>Figures from the sample estate (layout sample-01)</span>
-    </footer>
-  </main>
-</div>
+      <section class="pcard" aria-labelledby="impact">
+        <span class="kicker k-green">2 · Impact</span>
+        <h2 id="impact">Shade becomes a design input from day one.</h2>
+        <div class="stats">
+          <div class="stat"><span class="v green">3.7×</span><span class="l">outdoor shade of the AI layout vs a conventional slab layout</span></div>
+          <div class="stat"><span class="v green">2.9×</span><span class="l">shade at 13:00 with the same 40 trees, placed by AI</span></div>
+          <div class="stat"><span class="v"><span class="heat">41%</span> → <span class="green">99%</span></span><span class="l">seats in shade</span></div>
+          <div class="stat"><span class="v"><span class="heat">110</span> → <span class="green">26 m</span></span><span class="l">longest unshaded walk</span></div>
+        </div>
+        <ul>
+          <li><strong>Architects own outdoor shade from day one:</strong> every layout option is scored on hot-hour shade before one is chosen.</li>
+          <li><strong>One shared shade model for both disciplines.</strong> Design in two decisions: AI proposes and scores, designers choose.</li>
+        </ul>
+        <p class="fine">Equinox, 11:00–15:00. Tree figures are the best of three AI planting schemes: shade and seats from scheme C, walk from scheme A.</p>
+      </section>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- evidence -->
+  <section class="band" aria-labelledby="evidence">
+    <div class="sec-head">
+      <span class="kicker">Impact · 13:00, same blocks</span>
+      <h2 id="evidence">Forty trees, placed where people walk and sit.</h2>
+    </div>
+    <div class="pair">
+      <figure><img src="./assets/land-base-1300.png" alt="13:00 without new trees: most walks exposed and most seats in sun"><figcaption>Buildings and two retained trees only</figcaption></figure>
+      <figure><img src="./assets/land-C-1300.png" alt="13:00 with scheme C: most seats shaded and shorter unshaded walks"><figcaption>With 40 trees placed by the optimiser (scheme C)</figcaption></figure>
+    </div>
+    <div class="deltas">
+      <div><span class="l">Shaded ground at 13:00</span><span class="v">1,584 → <span>4,564 m²</span></span></div>
+      <div><span class="l">Seats in shade</span><span class="v">41% → <span>99%</span></span></div>
+      <div><span class="l">Longest unshaded walk</span><span class="v">110 → <span>36 m</span></span></div>
+    </div>
+    <p class="fine">Scheme A, which lines the most exposed walks instead, brings the longest unshaded walk down to 26 m.</p>
+  </section>
+
+  <!-- workflow -->
+  <section aria-labelledby="workflow">
+    <div class="sec-head">
+      <span class="kicker k-green">3 · Workflow</span>
+      <h2 id="workflow">From brief to planting in two decisions.</h2>
+    </div>
+    <ol class="flow">
+      <li><span class="n">1</span><b>Planning brief</b><span class="who">Architect</span></li>
+      <li class="ai"><span class="n">2</span><b>6 AI massing options</b><span class="who">AI</span></li>
+      <li><span class="n">3</span><b>Architect picks and edits, with live shade</b><span class="who">Decision 1</span></li>
+      <li class="ai"><span class="n">4</span><b>Automatic landscape layer: routes, activity areas, seats</b><span class="who">AI</span></li>
+      <li class="ai"><span class="n">5</span><b>3 tree strategies on the same budget</b><span class="who">AI</span></li>
+      <li><span class="n">6</span><b>Pick one, check it in 3D, export</b><span class="who">Decision 2</span></li>
+    </ol>
+    <div class="shots">
+      <figure><img src="./assets/app-massing.png" alt="Massing stage: planning brief, six options ranked by shade, and the plan of option 1"><figcaption>Stage 1 · six massing options ranked by hot-hour shade</figcaption></figure>
+      <figure><img src="./assets/app-landscape.png" alt="Landscape stage: three planting schemes compared beside the site plan at 13:00"><figcaption>Stage 2 · three ways to plant the same 40 trees</figcaption></figure>
+    </div>
+    <div class="three">
+      <figure><img src="./assets/3d-1100.png" alt="3D model at 11:00 with shadows falling west"><figcaption>11:00 · shadows fall west</figcaption></figure>
+      <figure><img src="./assets/3d-1300.png" alt="3D model at 13:00 with shade only under the trees"><figcaption>13:00 · shade only under trees</figcaption></figure>
+      <figure><img src="./assets/3d-1500.png" alt="3D model at 15:00 with shadows falling east"><figcaption>15:00 · shadows fall east</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section aria-labelledby="ai">
+    <div class="sec-head">
+      <span class="kicker k-green">4 · Where AI is involved</span>
+      <h2 id="ai">AI proposes and scores. Designers choose.</h2>
+    </div>
+    <div class="cards">
+      <article class="card"><span class="kicker k-green">Massing</span><h3>Generative search</h3><p>About 1,800 layouts per typology across 6 typologies, refined and ranked by shade.</p></article>
+      <article class="card"><span class="kicker k-green">Landscape</span><h3>A* routing</h3><p>Walking routes from the entrances and bus stop to every block.</p></article>
+      <article class="card"><span class="kicker k-green">Landscape</span><h3>Greedy optimiser</h3><p>Places each tree where it adds the most shade to seats, paths and playgrounds.</p></article>
+    </div>
+  </section>
+
+  <!-- feasibility -->
+  <section aria-labelledby="feasibility">
+    <div class="sec-head">
+      <span class="kicker k-green">5 · Feasibility</span>
+      <h2 id="feasibility">Fast enough for the first sketch.</h2>
+    </div>
+    <div class="cards">
+      <article class="card"><span class="big">~1 s</span><p>The full pipeline runs in the browser in about 1 s, with no simulation software and no GPU.</p></article>
+      <article class="card"><span class="big">4 inputs</span><p>It uses only concept-stage inputs: plot ratio, coverage, height limit, entrances.</p></article>
+      <article class="card"><span class="big">≤ 0.1%</span><p>Two independently written shade engines agree to within 0.1%.</p></article>
+      <article class="card"><span class="big">JSON</span><p>It exports JSON for Rhino/Grasshopper or detailed simulation.</p></article>
+    </div>
+  </section>
+
+  <!-- limitations -->
+  <section aria-labelledby="limits">
+    <div class="sec-head">
+      <span class="kicker k-heat">6 · Limitations</span>
+      <h2 id="limits">What it does not do yet.</h2>
+    </div>
+    <ul class="limits">
+      <li><strong>Human in the loop:</strong> AI ranks by shade only; views, identity and buildability stay with the designer.</li>
+      <li><strong>Geometric shade, not thermal comfort;</strong> the next step is UTCI / mean radiant temperature.</li>
+      <li><strong>One design day (equinox) and three hot hours.</strong></li>
+      <li><strong>No wind modelling:</strong> denser layouts may block monsoon breezes, and they add east/west façade heat (the tool flags this).</li>
+    </ul>
+  </section>
+
+  <footer>
+    <a class="btn" href="./app.html">Open the tool →</a>
+    <p>Figures from one run of the tool: seed 7, option 1 (staggered slabs, unedited), Singapore equinox at 11:00 / 13:00 / 15:00, each moment standing for 2 h, 2 m grid. Shade is geometric obstruction, not a thermal-comfort index.</p>
+  </footer>
+</main>
+
 </body>
 </html>
